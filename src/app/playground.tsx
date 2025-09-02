@@ -3,14 +3,14 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { Container } from '@/components/Container';
 import { ScreenContent } from '@/components/ScreenContent';
 
-export default function Details() {
+export default function Playground() {
   const { name } = useLocalSearchParams();
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Details' }} />
+      <Stack.Screen options={{ title: 'Playground' }} />
       <Container>
-        <ScreenContent path="screens/details.tsx" title={`Showing details for user ${name}`} />
+        <ScreenContent path="screens/playground.tsx" title={`Showing Playground for user ${name}`} />
       </Container>
     </>
   );
