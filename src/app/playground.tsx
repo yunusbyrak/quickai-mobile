@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack } from 'expo-router';
 
 import { Container } from '@/components/Container';
 import { ScreenContent } from '@/components/ScreenContent';
@@ -7,7 +7,6 @@ import ThemeSelector from '@/components/playground/theme-selector';
 import { View } from 'react-native';
 
 export default function Playground() {
-    const { name } = useLocalSearchParams();
 
     return (
         <>
