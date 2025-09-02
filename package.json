@@ -37,6 +37,7 @@
         "react-dom": "19.0.0",
         "react-i18next": "^15.7.3",
         "react-native": "0.79.5",
+        "react-native-country-flag": "^2.0.2",
         "react-native-gesture-handler": "~2.24.0",
         "react-native-mmkv": "^3.3.0",
         "react-native-nitro-modules": "^0.29.2",
