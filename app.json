@@ -23,7 +23,8 @@
                 }
             ],
             "expo-web-browser",
-            "expo-localization"
+            "expo-localization",
+            "expo-apple-authentication"
         ],
         "experiments": {
             "typedRoutes": true,
@@ -42,7 +43,8 @@
         ],
         "ios": {
             "supportsTablet": true,
-            "bundleIdentifier": "com.example.quick"
+            "bundleIdentifier": "com.example.quick",
+            "usesAppleSignIn": true
         },
         "android": {
             "adaptiveIcon": {

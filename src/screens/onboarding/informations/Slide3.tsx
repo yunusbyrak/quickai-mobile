@@ -34,7 +34,7 @@ export default function Slide3() {
                 </View>
 
                 {/* Chat Interface */}
-                <View className="space-y-4 mb-8">
+                <View className="gap-4 mb-8">
                     {/* User Question */}
                     <View className="bg-primary rounded-2xl rounded-br-md p-4 self-end max-w-[80%]">
                         <Text className="text-white font-poppins">

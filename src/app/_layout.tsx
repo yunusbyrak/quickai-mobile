@@ -9,8 +9,11 @@ import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import SplashScreen from '@/screens/splash-screen';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { StatusBar, View } from 'react-native';
+import { useAuthCheck } from '@/hooks/useAuthCheck';
 
 export default function Layout() {
+
+    const { isFinished: isAuthCheckFinished } = useAuthCheck();
 
     const [fontsLoaded, fontsError] = useFonts({
         'Poppins-Regular': require('~/assets/fonts/Poppins/Poppins-Regular.ttf'),
@@ -31,10 +34,11 @@ export default function Layout() {
     const [splashAnimationFinished, setSplashAnimationFinished] = useState(false);
 
     useEffect(() => {
-        if (fontsLoaded && !fontsError) {
+        if (fontsLoaded && !fontsError && isAuthCheckFinished) {
             setAppReady(true);
+            console.log(`App is ready`);
         }
-    }, [fontsLoaded, fontsError]);
+    }, [fontsLoaded, fontsError, isAuthCheckFinished]);
 
     if (!appReady || !splashAnimationFinished) {
         return <SplashScreen onAnimationFinish={() => setSplashAnimationFinished(true)} />;

@@ -3,7 +3,8 @@ import { Redirect } from 'expo-router';
 export default function Index() {
 
     // const redirectUrl = '/playground'
-    const redirectUrl = '/(onboarding)/welcome'
+    // const redirectUrl = '/(onboarding)/welcome'
+    const redirectUrl = '/(main)/home'
 
     const shouldRedirectToWelcome = () => {
         // Add your conditional logic here

@@ -40,7 +40,7 @@ export default function Slide1() {
                     Upload, Link, or Record
                 </Text>
 
-                <View className="space-y-6">
+                <View className="gap-6">
                     {features.map((feature) => (
                         <View key={feature.id} className="border border-dashed border-primary/30 rounded-2xl p-6 bg-card/50">
                             <View className="flex-row items-center gap-4">
@@ -66,7 +66,7 @@ export default function Slide1() {
             </View>
 
             {/* Floating Action Buttons */}
-            <View className="absolute bottom-32 right-6 items-end space-y-4">
+            <View className="absolute bottom-32 right-6 items-end gap-4">
                 <Pressable className="w-12 h-12 bg-primary/20 rounded-full items-center justify-center">
                     <MaterialIcons name="mic" size={24} color="#FF6700" />
                 </Pressable>

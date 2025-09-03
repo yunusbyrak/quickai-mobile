@@ -91,6 +91,9 @@ This is a React Native Expo app with TypeScript, using Expo Router for navigatio
 - Use CSS variables for theme-aware colors
 - Use Platform.select() for platform-specific styles within class variance authority
 
+### Nativewind unworking classes
+- space-y-4
+
 ### Component Variants
 - Use `class-variance-authority` (cva) for component variants
 - Define variants for size, variant, and other style options

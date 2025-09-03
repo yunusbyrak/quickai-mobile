@@ -30,13 +30,13 @@ module.exports = {
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',
                 primary: {
-                    DEFAULT: 'var(--primary)',
-                    hover: 'var(--primary-hover)',
+                    DEFAULT: 'hsl(var(--primary))',
+                    hover: 'hsl(var(--primary-hover))',
                     foreground: 'hsl(var(--primary-foreground))',
                 },
                 secondary: {
                     DEFAULT: 'hsl(var(--secondary))',
-                    foreground: 'var(--secondary-foreground)',
+                    foreground: 'hsl(var(--secondary-foreground))',
                 },
                 destructive: {
                     DEFAULT: 'hsl(var(--destructive))',
@@ -48,7 +48,7 @@ module.exports = {
                 },
                 accent: {
                     DEFAULT: 'hsl(var(--accent))',
-                    foreground: 'var(--accent-foreground)',
+                    foreground: 'hsl(var(--accent-foreground))',
                 },
                 popover: {
                     DEFAULT: 'hsl(var(--popover))',
