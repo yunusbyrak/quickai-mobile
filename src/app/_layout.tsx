@@ -1,10 +1,14 @@
 import '../../global.css';
 import '@/i18n';
-
+import { PortalHost } from '@rn-primitives/portal';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { useEffect, useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import SplashScreen from '@/screens/splash-screen';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { StatusBar, View } from 'react-native';
 
 export default function Layout() {
 
@@ -37,6 +41,37 @@ export default function Layout() {
     }
 
     return <>
-        <Stack />
+        <ThemeProvider>
+            <ThemedLayout>
+                <Stack
+                    screenOptions={{
+                        headerShown: false,
+                    }}
+                />
+                <PortalHost />
+            </ThemedLayout>
+        </ThemeProvider>
     </>;
 }
+
+function ThemedLayout({ children }: { children: React.ReactNode }) {
+    const { isDark, themeVars, themeMode } = useTheme();
+
+    return (
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <View style={[{ flex: 1 }, themeVars]}>
+                <StatusBar
+                    barStyle={isDark ? 'light-content' : 'dark-content'}
+                    backgroundColor={isDark ? '#0F0F0F' : '#FFFFFF'}
+                    translucent={false}
+                />
+                <Animated.View entering={FadeIn} className={'flex-1'}>
+                    {children}
+                </Animated.View>
+                {/* <Toaster /> */}
+            </View>
+        </GestureHandlerRootView>
+    );
+}
+
+

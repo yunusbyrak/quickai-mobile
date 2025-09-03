@@ -1,7 +1,10 @@
 import { Redirect } from 'expo-router';
 
 export default function Index() {
-    // TODO: Add conditional logic here later
+
+    // const redirectUrl = '/playground'
+    const redirectUrl = '/(onboarding)/welcome'
+
     const shouldRedirectToWelcome = () => {
         // Add your conditional logic here
         // For example: check if user is authenticated, has completed onboarding, etc.
@@ -9,7 +12,7 @@ export default function Index() {
     };
 
     if (shouldRedirectToWelcome()) {
-        return <Redirect href="/playground" />;
+        return <Redirect href={redirectUrl} />;
     }
 
     // TODO: Add your main home screen content here when conditions are met

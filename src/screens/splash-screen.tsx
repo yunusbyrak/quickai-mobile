@@ -17,7 +17,7 @@ const SplashScreen = ({
     const animation = useRef<LottieView>(null);
     return (
         <View
-            className='flex-1 items-center justify-center'
+            className='flex-1 items-center justify-center bg-background'
         >
             <AnimatedLottieView
                 exiting={ZoomOut}

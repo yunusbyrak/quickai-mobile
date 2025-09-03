@@ -1,0 +1,264 @@
+---
+alwaysApply: true
+---
+# QuickAI Cursor Rules
+
+## Project Overview
+This is a React Native Expo app with TypeScript, using Expo Router for navigation, NativeWind for styling, and various modern React Native libraries. The app supports internationalization, theming, and cross-platform development.
+
+## Code Style & Formatting
+
+### TypeScript
+- Use TypeScript for all new files
+- Prefer explicit types over `any`
+- Use interface declarations for object types
+- Use type aliases for union types and primitives
+- Always export types alongside components when relevant
+
+### Import Organization
+- Use absolute imports with `@/` prefix for src directory
+- Use `~/` prefix for root-level imports (assets, locales)
+- Group imports: React/React Native first, then third-party, then local imports
+- Use named imports when possible
+
+### File Naming
+- Use PascalCase for component files (.tsx)
+- Use camelCase for utility files (.ts)
+- Use kebab-case for config files
+- Screen components should be in PascalCase
+- Hook files should start with "use" prefix
+
+## Architecture Patterns
+
+### Component Structure
+- Functional components with hooks only
+- Use `React.ComponentProps` for extending native component props
+- Prefer composition over inheritance
+- Extract reusable logic into custom hooks
+
+### State Management
+- Use Zustand for global state management
+- Use MMKV for persistent storage
+- Use React Context for theme and i18n state
+- Prefer local state with useState for component-specific state
+
+### Styling
+- Use NativeWind (Tailwind CSS) for styling
+- Use `className` prop for styling components
+- Use CSS variables for theme colors (defined in global.css)
+- Combine Platform.select() with Tailwind classes for platform-specific styles
+- Use `cn()` utility function for conditional classes
+
+### Theme System
+- Support light/dark/system theme modes
+- Use CSS variables for color theming
+- Store theme preference in MMKV storage
+- Use ThemeContext for theme state management
+
+## File Organization
+
+### Directory Structure
+- `/src/app/` - Expo Router pages and layouts
+- `/src/components/` - Reusable components
+- `/src/components/ui/` - UI primitives (shadcn/ui style)
+- `/src/screens/` - Screen components
+- `/src/hooks/` - Custom hooks
+- `/src/lib/` - Utilities and configurations
+- `/src/store/` - Zustand stores
+- `/src/context/` - React contexts
+- `/src/types/` - TypeScript type definitions
+- `/src/constants/` - App constants
+- `/src/i18n/` - Internationalization setup
+
+### Component Patterns
+- Export component as default export
+- Export types and variants as named exports
+- Use `forwardRef` for components that need ref forwarding
+- Destructure props with default values
+
+## Internationalization (i18n)
+- Use react-i18next for translations
+- Store translations in `/locales/` directory
+- Use `useTranslation` hook for accessing translations
+- Support en, tr, pt, es languages
+- Save language preference in MMKV storage
+
+## Styling Guidelines
+
+### NativeWind Usage
+- Use Tailwind utility classes via `className` prop
+- Use `cn()` utility for combining classes conditionally
+- Use CSS variables for theme-aware colors
+- Use Platform.select() for platform-specific styles within class variance authority
+
+### Component Variants
+- Use `class-variance-authority` (cva) for component variants
+- Define variants for size, variant, and other style options
+- Use consistent naming: default, sm, lg for sizes
+- Use consistent naming: default, destructive, outline, secondary, ghost, link for variants
+
+### Colors and Theming
+- Use semantic color names (primary, secondary, muted, etc.)
+- Use HSL format for CSS variables
+- Use `--` prefix for CSS custom properties
+- Support both light and dark themes
+
+## React Native Specific
+
+### Platform Considerations
+- Use `Platform.select()` for platform-specific code
+- Test on both iOS and Android
+- Use `useSafeAreaInsets()` for safe area handling
+- Use appropriate React Native components (View, Text, Pressable)
+
+### Navigation
+- Use Expo Router for file-based routing
+- Use `(group)` syntax for route groups
+- Use `_layout.tsx` for nested layouts
+- Keep navigation logic in route components
+
+### Fonts
+- Use custom fonts (Poppins, Stolzl) loaded via expo-font
+- Define font families in Tailwind config
+- Use font-family utilities in classes
+
+## Performance
+
+### Optimization
+- Use React.memo for expensive components
+- Use useCallback and useMemo appropriately
+- Lazy load screens and heavy components
+- Use react-native-reanimated for animations
+
+### Storage
+- Use MMKV for fast synchronous storage
+- Use separate MMKV instances for different data types (state, auth, prefs)
+- Use Zustand persist middleware for state persistence
+
+## Testing & Quality
+
+### Code Quality
+- Use ESLint with Expo config
+- Use Prettier for code formatting
+- Follow the existing prettier config (100 char width, single quotes)
+- Use trailing commas for ES5 compatibility
+
+### Error Handling
+- Use try-catch blocks for async operations
+- Provide fallback values for storage operations
+- Log errors appropriately with console.error
+
+## Specific Conventions
+
+### Component Props
+- Use `React.ComponentProps<typeof Component>` for extending component props
+- Use `VariantProps<typeof variants>` for variant-based props
+- Always type children as `React.ReactNode`
+
+### Hooks
+- Custom hooks should start with "use" prefix
+- Return objects with named properties from hooks
+- Use TypeScript for hook return types
+
+### Constants
+- Export constants as named exports
+- Use UPPER_SNAKE_CASE for true constants
+- Use arrays for lists of supported values (like languages)
+
+### Storage Keys
+- Use descriptive names for storage keys
+- Use snake_case for storage keys
+- Prefix keys by category when appropriate
+
+## Dependencies Usage
+
+### Key Libraries
+- `expo-router` for navigation
+- `nativewind` for styling
+- `zustand` for state management
+- `react-i18next` for internationalization
+- `react-native-mmkv` for storage
+- `@supabase/supabase-js` for backend
+- `react-native-reanimated` for animations
+- `class-variance-authority` for component variants
+
+### UI Components
+- Use `@rn-primitives` for accessible primitives
+- Build custom UI components in `/src/components/ui/`
+- Use shadcn/ui patterns adapted for React Native
+
+## Best Practices
+
+### Code Organization
+- Keep components small and focused
+- Extract business logic into custom hooks
+- Use composition for complex components
+- Maintain consistent file structure
+
+### Performance
+- Minimize re-renders with proper dependency arrays
+- Use appropriate storage solutions (MMKV vs AsyncStorage)
+- Optimize images and assets
+- Use proper key props in lists
+
+### Accessibility
+- Use semantic HTML elements where applicable
+- Add proper role attributes
+- Support screen readers
+- Use accessible color contrasts
+
+### Security
+- Store sensitive data in appropriate MMKV instances
+- Use environment variables for API keys
+- Validate user inputs
+- Handle authentication state properly
+
+## Example Patterns
+
+### Component with Variants
+```tsx
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+
+const componentVariants = cva('base-classes', {
+  variants: {
+    variant: { default: 'variant-classes' },
+    size: { default: 'size-classes' }
+  },
+  defaultVariants: { variant: 'default', size: 'default' }
+});
+
+type Props = React.ComponentProps<typeof View> & VariantProps<typeof componentVariants>;
+
+export function Component({ className, variant, size, ...props }: Props) {
+  return <View className={cn(componentVariants({ variant, size }), className)} {...props} />;
+}
+```
+
+### Custom Hook
+```tsx
+import { useState, useEffect } from 'react';
+
+export const useCustomHook = () => {
+  const [state, setState] = useState<Type>(initialValue);
+
+  return { state, setState };
+};
+```
+
+### Theme-aware Component
+```tsx
+import { useTheme } from '@/context/ThemeContext';
+
+export function ThemedComponent() {
+  const { isDark, themeVars } = useTheme();
+
+  return (
+    <View className="bg-background text-foreground">
+      {/* Use theme-aware classes */}
+    </View>
+  );
+}
+```
+
+Follow these rules consistently to maintain code quality and project consistency.
