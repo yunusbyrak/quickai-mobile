@@ -1,4 +1,4 @@
-import React, {
+import {
     createContext,
     PropsWithChildren,
     useContext,
@@ -9,13 +9,10 @@ import { useRouter } from 'expo-router';
 import { Platform } from 'react-native';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import * as Localization from 'expo-localization';
 import { getInitialLanguage } from '@/i18n';
-
 import { Session } from '@supabase/supabase-js';
-
 import { supabase } from '@/lib/supabase';
-import { useProfileStore } from '@/stores/profileStore';
+import { useProfileStore } from '@/store/profile';
 import { useOnboardingStore } from '@/store/onboarding';
 
 
@@ -26,9 +23,9 @@ interface AuthContextState {
     signIn: (email: string, password: string) => Promise<void>;
     signInWithGoogle: () => Promise<void>;
     signInWithApple: () => Promise<void>;
-    resetPassword: (email: string) => Promise<void>;
+    signInWithAnonymous: () => Promise<Session | null>;
     signOut: () => Promise<void>;
-  }
+}
 
 export const AuthContext = createContext<AuthContextState>({
     initialized: false,
@@ -37,7 +34,7 @@ export const AuthContext = createContext<AuthContextState>({
     signIn: async () => { },
     signInWithGoogle: async () => { },
     signInWithApple: async () => { },
-    resetPassword: async () => { },
+    signInWithAnonymous: async () => { return null },
     signOut: async () => { },
 });
 
@@ -50,7 +47,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     // Zustand store for profile
     const { fetchProfile, clearProfile, profile } = useProfileStore();
-    const { completed: onboardingCompleted, reset: resetOnboarding } = useOnboardingStore();
+    const { reset: resetOnboarding } = useOnboardingStore();
 
 
     const createProfileWithLanguage = async (userId: string) => {
@@ -125,6 +122,25 @@ export function AuthProvider({ children }: PropsWithChildren) {
                 await createProfileWithLanguage(data.user.id);
             }
         }
+    };
+
+    const signInWithAnonymous = async () => {
+        const { data, error } = await supabase.auth.signInAnonymously();
+
+        if (error) {
+            console.error('Error signing in:', error);
+            throw error;
+        }
+
+        if (data.session) {
+            setSession(data.session);
+
+            // Load profile with language detection
+            if (data.user) {
+                await createProfileWithLanguage(data.user.id);
+            }
+        }
+        return data.session
     };
 
     const signInWithGoogle = async () => {
@@ -233,18 +249,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
         }
     };
 
-    const resetPassword = async (email: string) => {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: 'exp://localhost:8081/resetPassword', // Redirect URL after reset
-        });
-
-        if (error) {
-            console.error('Error sending reset password email:', error);
-            throw error;
-        }
-
-        console.log('Reset password email sent to:', email);
-    };
 
     const signOut = async () => {
         const { error } = await supabase.auth.signOut();
@@ -270,12 +274,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
         const initializeAuth = async () => {
             try {
                 console.log('🔄 Initializing authentication...');
-
+                let session = null;
                 // Get current session from Supabase (it handles persistence automatically)
                 const {
-                    data: { session },
+                    data: { session: currentSession },
                     error,
                 } = await supabase.auth.getSession();
+
+                if (!currentSession) {
+                    // sign in with anonymous
+                    const anonymousSession = await signInWithAnonymous();
+                    session = anonymousSession;
+                } else {
+                    session = currentSession;
+                }
 
                 if (error) {
                     console.error('❌ Error during getSession:', error);
@@ -325,10 +337,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
                     if (needsOnboarding) {
                         console.log('🚀 Redirecting to onboarding');
-                        router.replace('/onboarding');
+                        router.replace('/(onboarding)/welcome');
                     } else {
                         console.log('🏠 Redirecting to main app');
-                        router.replace('/(protected)/(tabs)');
+                        router.replace('/(main)/home');
                     }
                 } else {
                     // If no profile yet, wait a bit and try again
@@ -343,23 +355,37 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
                             if (needsOnboarding) {
                                 console.log('🚀 Delayed redirect to onboarding');
-                                router.replace('/onboarding');
+                                router.replace('/(onboarding)/welcome');
                             } else {
                                 console.log('🏠 Delayed redirect to main app');
-                                router.replace('/(protected)/(tabs)');
+                                router.replace('/(main)/home');
                             }
                         }
                     }, 500);
                 }
+            } else if (event === 'INITIAL_SESSION') {
+
+                const { profile: currentProfile } = useProfileStore.getState();
+
+                if (currentProfile) {
+                    const needsOnboarding =
+                        currentProfile.onboarding_completed === false ||
+                        currentProfile.onboarding_completed === undefined ||
+                        currentProfile.onboarding_completed === null;
+
+                    if (needsOnboarding) {
+                        console.log('🚀 Redirecting to onboarding');
+                        router.replace('/(onboarding)/welcome');
+                    } else {
+                        console.log('🏠 Redirecting to main app');
+                        router.replace('/(main)/home');
+                    }
+                }
+
             } else if (event === 'SIGNED_OUT') {
                 // Clear profile on logout
                 clearProfile();
                 resetOnboarding();
-
-                // Clear ALL MMKV caches
-                console.log('🗑️ SIGNED_OUT event - Clearing all MMKV caches...');
-                debug.clearAll();
-                console.log('✅ All MMKV caches have been cleared');
             }
         });
 
@@ -380,8 +406,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
                 signIn,
                 signInWithGoogle,
                 signInWithApple,
-                resetPassword,
                 signOut,
+                signInWithAnonymous,
             }}>
             {children}
         </AuthContext.Provider>

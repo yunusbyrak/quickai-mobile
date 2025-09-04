@@ -108,3 +108,22 @@ export const auth = {
 
 
 };
+
+// Simple debug
+export const debug = {
+    getAllKeys: () => ({
+      auth: storage.auth.getAllKeys(),
+      state: storage.state.getAllKeys(),
+      prefs: storage.prefs.getAllKeys(),
+    }),
+
+    getSize: () => ({
+      auth: storage.auth.getAllKeys().length,
+      state: storage.state.getAllKeys().length,
+      prefs: storage.prefs.getAllKeys().length,
+    }),
+
+    clearAll: () => {
+      Object.values(storage).forEach(instance => instance.clearAll());
+    },
+  };

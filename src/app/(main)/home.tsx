@@ -233,9 +233,12 @@ export default function Home() {
                         <MaterialIcons name="graphic-eq" size={16} color="#9CA3AF" />
                         <Text className="text-muted-foreground text-sm font-medium">Waves</Text>
                     </Pressable>
-                    <View className="w-12 h-12 bg-orange-500 rounded-full items-center justify-center">
+                    <TouchableOpacity
+                        className="w-12 h-12 bg-orange-500 rounded-full items-center justify-center"
+                        onPress={() => router.push('/(main)/audio-recording')}
+                    >
                         <MaterialIcons name="add" size={24} color="white" />
-                    </View>
+                    </TouchableOpacity>
                     <Pressable className="flex-row items-center gap-2 px-4 py-2 rounded-full">
                         <Ionicons name="chatbubble-ellipses" size={16} color="#9CA3AF" />
                         <Text className="text-muted-foreground text-sm font-medium">AI Chat</Text>

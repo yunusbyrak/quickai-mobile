@@ -8,6 +8,7 @@ import { SettingsSection, SettingsItem } from '@/components/settings-section';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAppPreferences } from '@/hooks/useAppPreferences';
 import { useRouter } from 'expo-router';
+import { debug } from '@/lib/storage';
 
 export default function Settings() {
     const insets = useSafeAreaInsets();
@@ -81,9 +82,6 @@ export default function Settings() {
     return (
         <View
             className="flex-1 bg-background"
-        // style={{
-        //     paddingTop: Math.max(insets.top, 16),
-        // }}
         >
 
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
@@ -125,6 +123,28 @@ export default function Settings() {
                         showChevron={false}
                         isFirst
                     />
+                    {__DEV__ && (
+                        <SettingsItem
+                            icon="delete"
+                            iconLibrary="MaterialIcons"
+                            title="Clear Cache"
+                            onPress={() => {
+                                Alert.alert(
+                                    'Clear Cache',
+                                    'Are you sure you want to clear the cache?',
+                                    [
+                                        { text: 'Cancel', style: 'cancel' },
+                                        {
+                                            text: 'Clear',
+                                            onPress: () => {
+                                                debug.clearAll();
+                                            },
+                                        },
+                                    ]
+                                );
+                            }}
+                        />
+                    )}
                     <SettingsItem
                         icon="info"
                         iconLibrary="MaterialIcons"
@@ -164,13 +184,6 @@ export default function Settings() {
                         title="Notifications"
                         value={preferences.notifications ? 'On' : 'Off'}
                         onPress={() => Alert.alert('Notifications', 'Notification settings coming soon!')}
-                    />
-                    <SettingsItem
-                        icon="save"
-                        iconLibrary="MaterialIcons"
-                        title="Auto Save"
-                        value={preferences.autoSave ? 'On' : 'Off'}
-                        onPress={() => Alert.alert('Auto Save', 'Auto save settings coming soon!')}
                     />
                     <SettingsItem
                         icon="help"

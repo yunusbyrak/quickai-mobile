@@ -9,11 +9,9 @@ import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import SplashScreen from '@/screens/splash-screen';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { StatusBar, View } from 'react-native';
-import { useAuthCheck } from '@/hooks/useAuthCheck';
+import { AuthProvider } from '@/context/AuthContext';
 
 export default function Layout() {
-
-    const { isFinished: isAuthCheckFinished } = useAuthCheck();
 
     const [fontsLoaded, fontsError] = useFonts({
         'Poppins-Regular': require('~/assets/fonts/Poppins/Poppins-Regular.ttf'),
@@ -34,11 +32,11 @@ export default function Layout() {
     const [splashAnimationFinished, setSplashAnimationFinished] = useState(false);
 
     useEffect(() => {
-        if (fontsLoaded && !fontsError && isAuthCheckFinished) {
+        if (fontsLoaded && !fontsError) {
             setAppReady(true);
             console.log(`App is ready`);
         }
-    }, [fontsLoaded, fontsError, isAuthCheckFinished]);
+    }, [fontsLoaded, fontsError]);
 
     if (!appReady || !splashAnimationFinished) {
         return <SplashScreen onAnimationFinish={() => setSplashAnimationFinished(true)} />;
@@ -47,12 +45,14 @@ export default function Layout() {
     return <>
         <ThemeProvider>
             <ThemedLayout>
-                <Stack
-                    screenOptions={{
-                        headerShown: false,
-                    }}
-                />
-                <PortalHost />
+                <AuthProvider>
+                    <Stack
+                        screenOptions={{
+                            headerShown: false,
+                        }}
+                    />
+                    <PortalHost />
+                </AuthProvider>
             </ThemedLayout>
         </ThemeProvider>
     </>;

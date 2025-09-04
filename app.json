@@ -24,7 +24,13 @@
             ],
             "expo-web-browser",
             "expo-localization",
-            "expo-apple-authentication"
+            "expo-apple-authentication",
+            [
+                "expo-audio",
+                {
+                    "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+                }
+            ]
         ],
         "experiments": {
             "typedRoutes": true,

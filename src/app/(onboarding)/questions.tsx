@@ -19,6 +19,8 @@ import { useTheme } from '@/context/ThemeContext';
 import PromoStep from '@/screens/onboarding/questions/PromoStep';
 import ReminderStep from '@/screens/onboarding/questions/ReminderStep';
 import QuestionStep from '@/screens/onboarding/questions/QuestionStep';
+import { useAuth } from '@/context/AuthContext';
+import { useOnboardingStore } from '@/store/onboarding';
 
 
 
@@ -27,6 +29,8 @@ import QuestionStep from '@/screens/onboarding/questions/QuestionStep';
 export default function Questions() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
+    const { session } = useAuth();
+    const { markCompleted } = useOnboardingStore();
     const { isDark } = useTheme();
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -109,6 +113,7 @@ export default function Questions() {
             setCurrentStepIndex(currentStepIndex + 1);
         } else {
             // All steps completed - navigate to main app
+            markCompleted(session?.user?.id || '');
             router.replace('/(main)/home');
         }
     }, [currentStepIndex, steps.length, router]);
