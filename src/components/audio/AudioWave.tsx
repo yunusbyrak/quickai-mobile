@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { View, Animated } from 'react-native';
 import { Audio } from 'expo-av';
+import LottieView from 'lottie-react-native';
 
 interface AudioWaveProps {
     isRecording: boolean;
@@ -10,6 +11,7 @@ interface AudioWaveProps {
 
 export const AudioWave = React.memo(({ isRecording, isPaused, recording }: AudioWaveProps) => {
     const [realtimeWave, setRealtimeWave] = useState<number[]>(() => Array(25).fill(0));
+    const animation = useRef<LottieView>(null);
 
     // Generate realistic static wave pattern for right side
     const staticWave = useMemo(() =>
@@ -119,8 +121,23 @@ export const AudioWave = React.memo(({ isRecording, isPaused, recording }: Audio
 
     return (
         <View className="absolute inset-x-0 top-1/2 -translate-y-1/2">
+            <View className='items-center justify-center'>
+                <LottieView
+                    autoPlay
+                    resizeMode='cover'
+                    ref={animation}
+                    loop={true}
+                    speed={recording && !isPaused ? 0.3 : 0}
+                    style={{
+
+                        height: 300,
+                        width: '60%',
+                    }}
+                    source={require('~/assets/lottie/wave.json')}
+                />
+            </View>
             <View className="flex-row items-center justify-center h-40 px-2">
-                {/* Left side - Real moving waves (Orange) */}
+
                 {realtimeAnimValues.map((animValue, index) => (
                     <Animated.View
                         key={`real-${index}`}
@@ -137,7 +154,7 @@ export const AudioWave = React.memo(({ isRecording, isPaused, recording }: Audio
                     />
                 ))}
 
-                {/* Right side - Static fake waves (Gray) */}
+
                 {staticAnimValues.map((animValue, index) => {
                     const height = staticWave[index];
                     const isDot = height < 15;
