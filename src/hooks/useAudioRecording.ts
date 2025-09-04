@@ -9,21 +9,29 @@ export const useAudioRecording = () => {
     const router = useRouter();
     const [recordingState, setRecordingState] = useState<RecordingState>('idle');
     const [recording, setRecording] = useState<Audio.Recording | null>(null);
+    const [recordingUri, setRecordingUri] = useState<string | null>(null);
 
-    const stopRecording = useCallback(async () => {
+    const stopRecording = useCallback(async (): Promise<string | null> => {
         if (recording) {
             try {
                 const status = await recording.getStatusAsync();
                 if (status.canRecord || status.isRecording) {
                     await recording.stopAndUnloadAsync();
                 }
+                const uri = recording.getURI();
+                console.log('🛑 Recording stopped, URI:', uri);
+                setRecordingUri(uri);
+                setRecording(null);
+                setRecordingState('idle');
+                return uri;
             } catch (error) {
                 console.log('Recording already unloaded or error stopping:', error);
+                setRecording(null);
+                setRecordingState('idle');
+                return null;
             }
-            setRecording(null);
-            setRecordingState('idle');
-            console.log('🛑 Recording stopped and cleaned up');
         }
+        return null;
     }, [recording]);
 
     const startRecording = useCallback(async () => {
@@ -70,9 +78,12 @@ export const useAudioRecording = () => {
     }, [stopRecording, router]);
 
     const handleDone = useCallback(async () => {
-        await stopRecording();
-        // Navigate to empty page - we'll design this later
-        router.push('/(main)/home');
+        const uri = await stopRecording();
+        // Navigate to preview page with audio URI
+        router.push({
+            pathname: '/(main)/audio-preview',
+            params: { audioUri: uri || '' }
+        });
     }, [stopRecording, router]);
 
     const handleRecordPress = useCallback(() => {
@@ -124,6 +135,7 @@ export const useAudioRecording = () => {
     return {
         recordingState,
         recording,
+        recordingUri,
         handleCancel,
         handleDone,
         handleRecordPress,
