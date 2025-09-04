@@ -2,7 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { getLocales } from 'expo-localization';
 import { prefs } from '@/lib/storage';
-import { languages } from '@/constants/language';
+import { getLanguageCodes } from '@/constants/language';
 
 import en from '~/locales/en.json';
 import tr from '~/locales/tr.json';
@@ -35,7 +35,7 @@ export const getInitialLanguage = () => {
 
     // Otherwise, use phone language
     const phoneLanguage = getLocales()[0]?.languageCode || 'en';
-    const supportedLanguages = languages;
+    const supportedLanguages = getLanguageCodes();
     const supportedLanguage = supportedLanguages.includes(phoneLanguage) ? phoneLanguage : 'en';
     console.log('📱 Phone language detected for i18n:', supportedLanguage);
     return supportedLanguage;
@@ -44,7 +44,7 @@ export const getInitialLanguage = () => {
 // Legacy function for backward compatibility
 export const getPhoneLanguage = () => {
     const phoneLanguage = getLocales()[0]?.languageCode || 'en';
-    const supportedLanguages = languages;
+    const supportedLanguages = getLanguageCodes();
     return supportedLanguages.includes(phoneLanguage) ? phoneLanguage : 'en';
 };
 

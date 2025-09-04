@@ -16,11 +16,11 @@ const Language = () => {
                     {
                         languages.map((language) => (
                             <TouchableOpacity
-                                key={language}
-                                onPress={() => changeLanguage(language)}
-                                className={`${currentLanguage === language ? 'border-2 border-primary' : ''}`}
+                                key={language.code}
+                                onPress={() => changeLanguage(language.code)}
+                                className={`${currentLanguage === language.code ? 'border-2 border-primary' : ''}`}
                             >
-                                <CountryFlag isoCode={getCountryFlag(language)} size={20} />
+                                <CountryFlag isoCode={getCountryFlag(language.code)} size={20} />
                             </TouchableOpacity>
                         ))
                     }

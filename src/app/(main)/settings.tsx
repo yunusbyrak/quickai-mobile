@@ -1,20 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, ScrollView, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { Text } from '@/components/ui/text';
 import { SubscriptionWidget } from '@/components/subscription-widget';
 import { SettingsSection, SettingsItem } from '@/components/settings-section';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAppPreferences } from '@/hooks/useAppPreferences';
 import { useRouter } from 'expo-router';
 import { debug } from '@/lib/storage';
+import { languages } from '@/constants/language';
 
 export default function Settings() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { profile, isSubscribed } = useUserProfile();
     const { preferences, updateLanguage, updateTheme, shareApp } = useAppPreferences();
+    const [showLanguageSelector, setShowLanguageSelector] = useState(false);
 
     const handleUpgrade = () => {
         Alert.alert(
@@ -25,22 +28,11 @@ export default function Settings() {
     };
 
     const handleLanguageChange = () => {
-        const languageOptions = [
-            { label: 'English', value: 'en' },
-            { label: 'Türkçe', value: 'tr' },
-            { label: 'Português', value: 'pt' },
-            { label: 'Español', value: 'es' },
-        ];
+        setShowLanguageSelector(true);
+    };
 
-        Alert.alert(
-            'Select Language',
-            'Choose your preferred language',
-            languageOptions.map(lang => ({
-                text: lang.label,
-                onPress: () => updateLanguage(lang.value),
-                style: preferences.language === lang.value ? 'default' : 'default'
-            }))
-        );
+    const handleLanguageSelect = (languageCode: string) => {
+        updateLanguage(languageCode);
     };
 
     const handleThemeChange = () => {
@@ -61,13 +53,8 @@ export default function Settings() {
     };
 
     const getLanguageLabel = (code: string) => {
-        const labels: Record<string, string> = {
-            en: 'English',
-            tr: 'Türkçe',
-            pt: 'Português',
-            es: 'Español',
-        };
-        return labels[code] || code;
+        const language = languages.find(lang => lang.code === code);
+        return language?.language || code;
     };
 
     const getThemeLabel = (theme: string) => {
@@ -209,6 +196,18 @@ export default function Settings() {
                 {/* Bottom Spacing */}
                 <View className="h-8" />
             </ScrollView>
+
+            {/* Language Selector Modal */}
+            <LanguageSelector
+                languages={languages}
+                selectedLanguage={preferences.language}
+                onLanguageSelect={handleLanguageSelect}
+                showAutoOption={false}
+                isVisible={showLanguageSelector}
+                onClose={() => setShowLanguageSelector(false)}
+                title="Language"
+                searchPlaceholder="Search language"
+            />
         </View>
     );
 }

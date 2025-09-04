@@ -26,7 +26,7 @@
         "clsx": "^2.1.1",
         "expo": "~53.0.22",
         "expo-apple-authentication": "~7.2.4",
-        "expo-audio": "~0.4.9",
+        "expo-av": "~15.1.7",
         "expo-constants": "~17.1.4",
         "expo-dev-client": "~5.2.4",
         "expo-dev-launcher": "^5.0.17",

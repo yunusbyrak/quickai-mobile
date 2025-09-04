@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { prefs } from '@/lib/storage';
 import { useTheme } from '@/context/ThemeContext';
 import { useTranslation } from '@/hooks/useTranslation';
-import { languages } from '@/constants/language';
+import { getLanguageCodes } from '@/constants/language';
 
 interface AppPreferences {
     language: string;
@@ -42,7 +42,7 @@ export const useAppPreferences = () => {
     }, [themeMode]);
 
     const updateLanguage = async (language: string) => {
-        if (languages.includes(language)) {
+        if (getLanguageCodes().includes(language)) {
             prefs.set('language', language);
             await changeLanguage(language);
             setPreferences(prev => ({ ...prev, language }));
