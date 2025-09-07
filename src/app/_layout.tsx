@@ -10,6 +10,7 @@ import SplashScreen from '@/screens/splash-screen';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { StatusBar, View } from 'react-native';
 import { AuthProvider } from '@/context/AuthContext';
+import { RevenueCatProvider } from '@/context/RevenuCatContext';
 
 export default function Layout() {
 
@@ -43,18 +44,20 @@ export default function Layout() {
     }
 
     return <>
-        <ThemeProvider>
-            <ThemedLayout>
-                <AuthProvider>
-                    <Stack
-                        screenOptions={{
-                            headerShown: false,
-                        }}
-                    />
-                    <PortalHost />
-                </AuthProvider>
-            </ThemedLayout>
-        </ThemeProvider>
+        <RevenueCatProvider>
+            <ThemeProvider>
+                <ThemedLayout>
+                    <AuthProvider>
+                        <Stack
+                            screenOptions={{
+                                headerShown: false,
+                            }}
+                        />
+                        <PortalHost />
+                    </AuthProvider>
+                </ThemedLayout>
+            </ThemeProvider>
+        </RevenueCatProvider>
     </>;
 }
 

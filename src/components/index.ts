@@ -1,6 +1,8 @@
 // Main reusable components
 export { LanguageSelector, type Language, type LanguageSelectorProps } from './LanguageSelector';
 export { LanguageSelectorDropdown, type LanguageSelectorDropdownProps } from './LanguageSelectorDropdown';
+export { NoteItem, type NoteItemProps } from './NoteItem';
+export { NotesList, type NotesListProps } from './NotesList';
 
 // Audio Components
 export { AudioWave } from './audio/AudioWave';
@@ -10,6 +12,9 @@ export { RecordingTimer } from './audio/RecordingTimer';
 export { AudioPlayer } from './audio/AudioPlayer';
 export { ProcessingStatus, type ProcessingStep } from './audio/ProcessingStatus';
 export { PreviewContent } from './audio/PreviewContent';
+
+// UI Components
+export { SvgIcon } from './ui/svg-icon';
 
 // Other components
 export { Container } from './Container';

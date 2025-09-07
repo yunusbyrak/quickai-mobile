@@ -1,0 +1,211 @@
+import { Pressable, View } from 'react-native'
+import { MaterialIcons } from '@expo/vector-icons'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { Text } from '@/components/ui/text'
+import { SvgIcon } from '@/components/ui/svg-icon'
+import { cn } from '@/lib/utils'
+import type { Note } from '@/types/note'
+import React from 'react'
+
+const noteItemVariants = cva('bg-card rounded-lg border border-border', {
+    variants: {
+        variant: {
+            list: 'p-2 px-3 mb-3',
+            grid: 'p-3 flex-1'
+        }
+    },
+    defaultVariants: {
+        variant: 'list'
+    }
+})
+
+const noteIconVariants = cva('rounded-lg items-center justify-center', {
+    variants: {
+        variant: {
+            list: 'w-10 h-10',
+            grid: 'w-8 h-8'
+        }
+    },
+    defaultVariants: {
+        variant: 'list'
+    }
+})
+
+export interface NoteItemProps extends VariantProps<typeof noteItemVariants> {
+    note: Note
+    onPress?: (note: Note) => void
+    className?: string
+    gridColumns?: number
+}
+
+const getIconForNoteType = (type: string | null) => {
+    switch (type) {
+        case 'audio':
+            return 'graphic-eq'
+        case 'pdf':
+            return 'picture-as-pdf'
+        case 'youtube':
+            return 'play-circle-outline'
+        case 'image':
+            return 'image'
+        case 'website':
+            return 'language'
+        case 'meet':
+        case 'zoom':
+        case 'teams':
+            return 'videocam'
+        default:
+            return 'graphic-eq'
+    }
+}
+
+const getColorForNoteType = (type: string | null) => {
+    switch (type) {
+        case 'audio':
+            return '#FF6B35'
+        case 'pdf':
+            return '#E53E3E'
+        case 'youtube':
+            return '#FF0000'
+        case 'image':
+            return '#805AD5'
+        case 'website':
+            return '#38A169'
+        case 'meet':
+        case 'zoom':
+        case 'teams':
+            return '#3182CE'
+        default:
+            return '#FF6B35'
+    }
+}
+
+const renderNoteIcon = (type: string | null, size: number, color: string) => {
+    // Use SVG icons for specific types
+    if (type === 'youtube' || type === 'image' || type === 'pdf') {
+        return <SvgIcon name={type as 'youtube' | 'image' | 'pdf'} size={size} color={color} />
+    }
+
+    // Use MaterialIcons for other types
+    const iconName = getIconForNoteType(type) as any
+    return <MaterialIcons name={iconName} size={size} color={color} />
+}
+
+const formatDate = (dateString: string | null): string => {
+    if (!dateString) return ''
+
+    const date = new Date(dateString)
+    const now = new Date()
+    const diff = now.getTime() - date.getTime()
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+
+    if (days === 0) {
+        return 'Today'
+    } else if (days === 1) {
+        return 'Yesterday'
+    } else if (days < 7) {
+        return `${days} days ago`
+    } else {
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+        })
+    }
+}
+
+const formatTime = (dateString: string | null): string => {
+    if (!dateString) return ''
+
+    const date = new Date(dateString)
+    return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+    })
+}
+
+export const NoteItem = React.forwardRef<
+    React.ElementRef<typeof Pressable>,
+    NoteItemProps
+>(({ note, onPress, variant, className, gridColumns, ...props }, ref) => {
+    const displayDate = note.displayDate || formatDate(note.created_at)
+    const displayTime = note.displayTime || formatTime(note.created_at)
+    const iconColor = getColorForNoteType(note.type)
+
+    if (variant === 'grid') {
+        return (
+            <Pressable
+                ref={ref}
+                onPress={() => onPress?.(note)}
+                className={cn(noteItemVariants({ variant }), className)}
+                {...props}
+            >
+                <View className="gap-2">
+                    <View className={cn(noteIconVariants({ variant }), "bg-muted")}>
+                        {renderNoteIcon(note.type, 20, iconColor)}
+                    </View>
+                    <View className="gap-2">
+                        <View className="justify-center">
+                            <Text
+                                variant="small"
+                                className="font-semibold text-xs text-foreground text-start"
+                                numberOfLines={2}
+                            >
+                                {note.title || 'Untitled Note'}
+                            </Text>
+                        </View>
+                        <View className="h-px bg-border" />
+                    </View>
+
+                    <View className="gap-1">
+                        <Text className="text-muted-foreground text-xs">
+                            {displayDate} {displayTime}
+                        </Text>
+                        {(note.tag || note.folder_name) && (
+                            <View className="bg-muted px-2 py-1 rounded self-start">
+                                <Text className="text-muted-foreground text-">
+                                    {note.tag || note.folder_name || note.type}
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                </View>
+            </Pressable>
+        )
+    }
+
+    return (
+        <Pressable
+            ref={ref}
+            onPress={() => onPress?.(note)}
+            className={cn(noteItemVariants({ variant }), className)}
+            {...props}
+        >
+            <View className="flex-row items-center gap-3">
+                <View className={cn(noteIconVariants({ variant }), "bg-muted")}>
+                    {renderNoteIcon(note.type, 20, iconColor)}
+                </View>
+
+                <View className="flex-1 flex-col gap-1">
+                    <Text variant="small" className="font-semibold  text-foreground text-start" numberOfLines={1}>
+                        {note.title || 'Untitled Note'}
+                    </Text>
+
+                    <View className="flex-row items-center gap-2">
+                        <Text className="text-muted-foreground text-xs">
+                            {displayDate} {displayTime}
+                        </Text>
+                        {(note.tag || note.folder_name) && (
+                            <View className="bg-muted px-2 py-1 rounded">
+                                <Text className="text-muted-foreground text-xs">
+                                    {note.tag || note.folder_name || note.type}
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                </View>
+            </View>
+        </Pressable>
+    )
+})
+
+NoteItem.displayName = 'NoteItem'

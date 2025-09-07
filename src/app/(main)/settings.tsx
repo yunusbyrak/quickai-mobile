@@ -6,16 +6,17 @@ import { Text } from '@/components/ui/text';
 import { SubscriptionWidget } from '@/components/subscription-widget';
 import { SettingsSection, SettingsItem } from '@/components/settings-section';
 import { LanguageSelector } from '@/components/LanguageSelector';
-import { useUserProfile } from '@/hooks/useUserProfile';
+
 import { useAppPreferences } from '@/hooks/useAppPreferences';
 import { useRouter } from 'expo-router';
 import { debug } from '@/lib/storage';
 import { languages } from '@/constants/language';
+import { useProfile } from '@/hooks/useProfile';
 
 export default function Settings() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
-    const { profile, isSubscribed } = useUserProfile();
+    const { profile, isPremiumUser } = useProfile();
     const { preferences, updateLanguage, updateTheme, shareApp } = useAppPreferences();
     const [showLanguageSelector, setShowLanguageSelector] = useState(false);
 
@@ -80,15 +81,15 @@ export default function Settings() {
                 </View>
 
                 {/* Premium Upgrade Widget - Only show if not subscribed */}
-                {!isSubscribed && <SubscriptionWidget onUpgrade={handleUpgrade} />}
+                {!isPremiumUser && <SubscriptionWidget onUpgrade={handleUpgrade} />}
 
                 {/* Subscription Section */}
                 <SettingsSection title="Subscription">
                     <SettingsItem
                         icon="star"
                         iconLibrary="MaterialIcons"
-                        title={isSubscribed ? 'Premium' : 'Free'}
-                        subtitle={isSubscribed ? 'All features unlocked' : 'Limited features'}
+                        title={isPremiumUser ? 'Premium' : 'Free'}
+                        subtitle={isPremiumUser ? 'All features unlocked' : 'Limited features'}
                         showChevron={false}
                         isFirst
                         isLast
@@ -101,12 +102,12 @@ export default function Settings() {
                         leftElement={
                             <View className="w-10 h-10 rounded-full bg-orange-500 items-center justify-center">
                                 <Text className="text-white font-poppins-bold text-lg">
-                                    {profile?.full_name?.charAt(0) || profile?.email?.charAt(0)?.toUpperCase() || 'E'}
+                                    {profile?.first_name?.charAt(0) || profile?.last_name?.charAt(0)?.toUpperCase() || 'E'}
                                 </Text>
                             </View>
                         }
-                        title={profile?.full_name || 'User'}
-                        subtitle={profile?.email || 'user@example.com'}
+                        title={profile?.first_name || 'User'}
+                        subtitle={profile?.email || profile?.id}
                         showChevron={false}
                         isFirst
                     />
