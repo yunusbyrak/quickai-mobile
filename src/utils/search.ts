@@ -1,7 +1,8 @@
 import type { Note } from '@/types/note'
+import type { Folder } from '@/types/folder'
 
 /**
- * Search utility functions for filtering notes
+ * Search utility functions for filtering notes and folders
  */
 
 export interface SearchOptions {
@@ -10,12 +11,23 @@ export interface SearchOptions {
   searchFields?: (keyof Note)[]
 }
 
+export interface FolderSearchOptions {
+  caseSensitive?: boolean
+  exactMatch?: boolean
+  searchFields?: (keyof Folder)[]
+}
+
 const DEFAULT_SEARCH_FIELDS: (keyof Note)[] = [
   'title',
   'summary',
   'tag',
   'folder_name',
   'type'
+]
+
+const DEFAULT_FOLDER_SEARCH_FIELDS: (keyof Folder)[] = [
+  'title',
+  'description'
 ]
 
 /**
@@ -32,7 +44,7 @@ const normalizeText = (text: string, caseSensitive: boolean = false): string => 
 const fieldMatches = (
   fieldValue: any,
   query: string,
-  options: SearchOptions
+  options: SearchOptions | FolderSearchOptions
 ): boolean => {
   if (!fieldValue || !query) return false
 
@@ -146,5 +158,83 @@ export const advancedSearch = (
   // For multiple terms, find notes that match ALL terms
   return notes.filter(note => {
     return terms.every(term => searchNote(note, term, options))
+  })
+}
+
+/**
+ * Search through a single folder
+ */
+export const searchFolder = (folder: Folder, query: string, options: FolderSearchOptions = {}): boolean => {
+  if (!query.trim()) return true
+
+  const searchFields = options.searchFields || DEFAULT_FOLDER_SEARCH_FIELDS
+
+  return searchFields.some(field => {
+    const fieldValue = folder[field]
+    return fieldMatches(fieldValue, query, options)
+  })
+}
+
+/**
+ * Search through an array of folders
+ */
+export const searchFolders = (
+  folders: Folder[],
+  query: string,
+  options: FolderSearchOptions = {}
+): Folder[] => {
+  if (!query.trim()) return folders
+
+  return folders.filter(folder => searchFolder(folder, query, options))
+}
+
+/**
+ * Get folder search suggestions based on existing folders
+ */
+export const getFolderSearchSuggestions = (
+  folders: Folder[],
+  query: string,
+  maxSuggestions: number = 5
+): string[] => {
+  if (!query.trim() || query.length < 2) return []
+
+  const suggestions = new Set<string>()
+  const normalizedQuery = normalizeText(query)
+
+  folders.forEach(folder => {
+    // Add title suggestions
+    if (folder.title && normalizeText(folder.title).includes(normalizedQuery)) {
+      suggestions.add(folder.title)
+    }
+
+    // Add description suggestions
+    if (folder.description && normalizeText(folder.description).includes(normalizedQuery)) {
+      suggestions.add(folder.description)
+    }
+  })
+
+  return Array.from(suggestions).slice(0, maxSuggestions)
+}
+
+/**
+ * Advanced folder search with multiple terms
+ */
+export const advancedFolderSearch = (
+  folders: Folder[],
+  query: string,
+  options: FolderSearchOptions = {}
+): Folder[] => {
+  if (!query.trim()) return folders
+
+  // Split query into terms
+  const terms = query.split(/\s+/).filter(term => term.length > 0)
+
+  if (terms.length === 1) {
+    return searchFolders(folders, terms[0], options)
+  }
+
+  // For multiple terms, find folders that match ALL terms
+  return folders.filter(folder => {
+    return terms.every(term => searchFolder(folder, term, options))
   })
 }

@@ -3,6 +3,8 @@ export { LanguageSelector, type Language, type LanguageSelectorProps } from './L
 export { LanguageSelectorDropdown, type LanguageSelectorDropdownProps } from './LanguageSelectorDropdown';
 export { NoteItem, type NoteItemProps } from './NoteItem';
 export { NotesList, type NotesListProps } from './NotesList';
+export { FolderItem, type FolderItemProps } from './FolderItem';
+export { FolderList, type FolderListProps } from './FolderList';
 
 // Audio Components
 export { AudioWave } from './audio/AudioWave';
