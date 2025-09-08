@@ -3,8 +3,8 @@ import { View, ScrollView, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { Text } from '@/components/ui/text';
-import { SubscriptionWidget } from '@/components/subscription-widget';
-import { SettingsSection, SettingsItem } from '@/components/settings-section';
+import { SubscriptionWidget } from '@/components/SubscriptionWidget';
+import { SettingsSection, SettingsItem } from '@/components/SettingsSection';
 import { LanguageSelector } from '@/components/LanguageSelector';
 
 import { useAppPreferences } from '@/hooks/useAppPreferences';

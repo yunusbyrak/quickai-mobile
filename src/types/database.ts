@@ -335,6 +335,7 @@ export type Database = {
       notes: {
         Row: {
           created_at: string | null
+          favorite: boolean
           folder_id: string | null
           id: string
           language: string | null
@@ -349,6 +350,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          favorite?: boolean
           folder_id?: string | null
           id?: string
           language?: string | null
@@ -363,6 +365,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          favorite?: boolean
           folder_id?: string | null
           id?: string
           language?: string | null

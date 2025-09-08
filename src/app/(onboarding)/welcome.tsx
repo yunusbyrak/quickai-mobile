@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'expo-router';
 
 const features = [

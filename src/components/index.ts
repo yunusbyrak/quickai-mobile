@@ -20,6 +20,6 @@ export { SearchBar, type SearchBarProps } from './ui/search-bar';
 
 // Other components
 export { Container } from './Container';
-export { ThemeToggle } from './theme-toggle';
-export { SettingsSection } from './settings-section';
-export { SubscriptionWidget } from './subscription-widget';
+export { ThemeToggle } from './ThemeToggle';
+export { SettingsSection } from './SettingsSection';
+export { SubscriptionWidget } from './SubscriptionWidget';
