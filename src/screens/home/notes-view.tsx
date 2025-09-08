@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { HapticButton, NotesList, SearchBar } from '@/components'
-import { useNotes } from '@/hooks/useNotes'
+import { Note, useNotes } from '@/hooks/useNotes'
 import { useSearch } from '@/hooks/useSearch'
 import { searchNotes } from '@/utils/search'
 import { supabase } from '@/lib/supabase'
@@ -19,7 +19,7 @@ export default function NotesView({
 }: NotesViewProps) {
 
     const [isGridView, setIsGridView] = useState(false)
-    const { notes, loading, error, refresh } = useNotes({ folderId: null })
+    const { notes, loading, error, refresh, deleteNote, updateNoteFavorite } = useNotes({ folderId: null })
 
     // Search functionality with debouncing
     const { query, debouncedQuery, setQuery, clearSearch, isSearching } = useSearch({
@@ -32,6 +32,29 @@ export default function NotesView({
         if (!debouncedQuery.trim()) return notes
         return searchNotes(notes, debouncedQuery)
     }, [notes, debouncedQuery])
+
+    const onNotePress = (note: Note) => {
+        // TODO: Navigate to note detail
+        console.log('Note pressed:', note.title)
+    }
+
+    const onNoteDelete = async (noteId: string) => {
+        await deleteNote(noteId)
+    }
+
+    const onNoteFavorite = async (noteId: string, favorite: boolean) => {
+        await updateNoteFavorite(noteId, favorite)
+    }
+
+    const onNoteShare = (noteId: string) => {
+        // TODO: Share note
+        console.log('Note shared:', noteId)
+    }
+
+    const onNoteAddToCategory = (noteId: string) => {
+        // TODO: Add note to category
+        console.log('Note added to category:', noteId)
+    }
 
     return (
         <>
@@ -65,10 +88,11 @@ export default function NotesView({
                 <NotesList
                     notes={filteredNotes}
                     isGridView={isGridView}
-                    onNotePress={(note) => {
-                        // TODO: Navigate to note detail
-                        console.log('Note pressed:', note.title)
-                    }}
+                    onNotePress={onNotePress}
+                    onNoteDelete={onNoteDelete}
+                    onNoteFavorite={onNoteFavorite}
+                    onNoteShare={onNoteShare}
+                    onNoteAddToCategory={onNoteAddToCategory}
                     emptyState={
                         debouncedQuery.trim() ? (
                             <View className="flex-1 items-center justify-center py-8">

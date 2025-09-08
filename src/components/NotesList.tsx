@@ -9,6 +9,10 @@ import type { Note } from '@/types/note'
 export interface NotesListProps {
     notes: Note[]
     onNotePress?: (note: Note) => void
+    onNoteDelete?: (noteId: string) => void
+    onNoteFavorite?: (noteId: string, favorite: boolean) => void
+    onNoteShare?: (noteId: string) => void
+    onNoteAddToCategory?: (noteId: string) => void
     isGridView?: boolean
     className?: string
     emptyState?: React.ReactNode
@@ -61,7 +65,7 @@ const createGridData = (notes: Note[], gridColumns: number): GridRowData[] => {
 export const NotesList = React.forwardRef<
     React.ElementRef<typeof View>,
     NotesListProps
->(({ notes, onNotePress, isGridView = false, className, emptyState, ...props }, ref) => {
+>(({ notes, onNotePress, onNoteDelete, onNoteFavorite, onNoteShare, onNoteAddToCategory, isGridView = false, className, emptyState, ...props }, ref) => {
     if (notes.length === 0) {
         return (
             <View ref={ref} className={cn('flex-1', className)} {...props}>
@@ -84,6 +88,10 @@ export const NotesList = React.forwardRef<
             <View className="flex-row mb-2">
                 {item.notes.map((note, index) => (
                     <NoteItem
+                        onDelete={onNoteDelete}
+                        onFavorite={onNoteFavorite}
+                        onShare={onNoteShare}
+                        onAddToCategory={onNoteAddToCategory}
                         className={cn(
                             'bg-background border-primary/20',
                             index < item.notes.length - 1 ? 'mr-2' : '', // Add margin right except for last item
@@ -116,6 +124,10 @@ export const NotesList = React.forwardRef<
                     note={item}
                     variant="list"
                     onPress={onNotePress}
+                    onDelete={onNoteDelete}
+                    onFavorite={onNoteFavorite}
+                    onShare={onNoteShare}
+                    onAddToCategory={onNoteAddToCategory}
                 />
             </View>
         )

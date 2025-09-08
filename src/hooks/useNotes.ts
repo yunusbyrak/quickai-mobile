@@ -17,6 +17,8 @@ interface UseNotesResult {
     loading: boolean;
     error: string | null;
     refresh: () => Promise<void>;
+    deleteNote: (noteId: string) => Promise<void>;
+    updateNoteFavorite: (noteId: string, favorite: boolean) => Promise<void>;
 }
 
 function getNotesFromCache(): Note[] {
@@ -83,6 +85,34 @@ export const useNotes = (options?: UseNotesOptions): UseNotesResult => {
         }
     }, []);
 
+    const deleteNote = useCallback(async (noteId: string) => {
+        const {data, error: supabaseError} = await supabase
+            .from('notes')
+            .delete()
+            .eq('id', noteId);
+
+        if (supabaseError) {
+            throw supabaseError;
+        }
+
+        setAllNotes(allNotes.filter(note => note.id !== noteId));
+            setNotesToCache(allNotes.filter(note => note.id !== noteId));
+    }, []);
+
+    const updateNoteFavorite = useCallback(async (noteId: string, favorite: boolean) => {
+        const {data, error: supabaseError} = await supabase
+            .from('notes')
+            .update({ favorite: favorite })
+            .eq('id', noteId);
+
+        if (supabaseError) {
+            throw supabaseError;
+        }
+
+        setAllNotes(allNotes.map(note => note.id === noteId ? { ...note, favorite: favorite } : note));
+        setNotesToCache(allNotes.map(note => note.id === noteId ? { ...note, favorite: favorite } : note));
+    }, []);
+
     // Subscribe to realtime changes
     useEffect(() => {
         fetchNotes();
@@ -144,6 +174,8 @@ export const useNotes = (options?: UseNotesOptions): UseNotesResult => {
         loading,
         error,
         refresh: fetchNotes,
+        deleteNote,
+        updateNoteFavorite
     };
 };
 

@@ -9,8 +9,6 @@ import React from 'react'
 import { Skeleton } from './ui/skeleton'
 import { HapticButton } from './ui/haptic-button'
 import { ContextMenu, type ContextMenuAction } from './ui/context-menu'
-import { toggleFavorite } from '@/services/notes.service'
-
 
 const noteItemVariants = cva('bg-card rounded-lg border border-border', {
     variants: {
@@ -39,6 +37,10 @@ const noteIconVariants = cva('rounded-lg items-center justify-center', {
 export interface NoteItemProps extends VariantProps<typeof noteItemVariants> {
     note: Note
     onPress?: (note: Note) => void
+    onDelete?: (noteId: string) => void
+    onFavorite?: (noteId: string, favorite: boolean) => void
+    onShare?: (noteId: string) => void
+    onAddToCategory?: (noteId: string) => void
     className?: string
     gridColumns?: number
 }
@@ -140,7 +142,7 @@ const formatTime = (dateString: string | null): string => {
 export const NoteItem = React.forwardRef<
     React.ElementRef<typeof TouchableOpacity>,
     NoteItemProps
->(({ note, onPress, variant, className, gridColumns, ...props }, ref) => {
+>(({ note, onPress, variant, className, gridColumns, onDelete, onFavorite, onShare, onAddToCategory, ...props }, ref) => {
     const displayDate = note.displayDate || formatDate(note.created_at)
     const displayTime = note.displayTime || formatTime(note.created_at)
     const iconColor = getColorForNoteType(note.type)
@@ -157,6 +159,11 @@ export const NoteItem = React.forwardRef<
             systemIcon: 'square.and.arrow.up',
         },
         {
+            id: 'add-to-category',
+            title: 'Add to Category',
+            systemIcon: 'folder',
+        },
+        {
             id: 'delete',
             title: 'Delete',
             systemIcon: 'trash',
@@ -167,20 +174,18 @@ export const NoteItem = React.forwardRef<
     const onContextMenuActionPress = async (actionId: string, action: ContextMenuAction) => {
         switch (actionId) {
             case 'add-to-favorites':
-                // Handle add to favorites
-                const addFavoriteResponse = await toggleFavorite(note.user_id!, note.id, true);
-                console.log('addFavoriteResponse.id', addFavoriteResponse);
+                onFavorite?.(note.id, true)
                 break;
             case 'remove-from-favorites':
-                // Handle remove from favorites
-                const removeFavoriteResponse = await toggleFavorite(note.user_id!, note.id, false);
-                console.log('removeFavoriteResponse.id', removeFavoriteResponse);
+                onFavorite?.(note.id, false)
                 break;
             case 'share':
-                console.log('share');
+                onShare?.(note.id)
+                break;
+            case 'add-to-category':
+                onAddToCategory?.(note.id)
                 break;
             case 'delete':
-                // Show alert confirmation before delete
                 Alert.alert(
                     'Delete Note',
                     'Are you sure you want to delete this note?',
@@ -193,14 +198,13 @@ export const NoteItem = React.forwardRef<
                             text: 'Delete',
                             style: 'destructive',
                             onPress: () => {
-                                // Handle delete logic here
+                                onDelete?.(note.id)
                             },
                         },
                     ],
                     { cancelable: true }
                 );
                 break;
-            // Handle other actions...
         }
     }
 
@@ -322,4 +326,3 @@ export const NoteItem = React.forwardRef<
     )
 })
 
-NoteItem.displayName = 'NoteItem'
