@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, Pressable, TouchableOpacity, View } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Text } from '@/components/ui/text'
@@ -8,7 +8,8 @@ import type { Note } from '@/types/note'
 import React from 'react'
 import { Skeleton } from './ui/skeleton'
 import { HapticButton } from './ui/haptic-button'
-import { ContextMenu } from '@expo/ui/swift-ui';
+import { ContextMenu, type ContextMenuAction } from './ui/context-menu'
+import { toggleFavorite } from '@/services/notes.service'
 
 
 const noteItemVariants = cva('bg-card rounded-lg border border-border', {
@@ -144,8 +145,135 @@ export const NoteItem = React.forwardRef<
     const displayTime = note.displayTime || formatTime(note.created_at)
     const iconColor = getColorForNoteType(note.type)
 
+    const actions: ContextMenuAction[] = [
+        {
+            id: note.favorite ? 'remove-from-favorites' : 'add-to-favorites',
+            title: note.favorite ? 'Remove from Favorites' : 'Add to Favorites',
+            systemIcon: note.favorite ? 'heart.fill' : 'heart',
+        },
+        {
+            id: 'share',
+            title: 'Share',
+            systemIcon: 'square.and.arrow.up',
+        },
+        {
+            id: 'delete',
+            title: 'Delete',
+            systemIcon: 'trash',
+            destructive: true,
+        },
+    ];
+
+    const onContextMenuActionPress = async (actionId: string, action: ContextMenuAction) => {
+        switch (actionId) {
+            case 'add-to-favorites':
+                // Handle add to favorites
+                const addFavoriteResponse = await toggleFavorite(note.user_id!, note.id, true);
+                console.log('addFavoriteResponse.id', addFavoriteResponse);
+                break;
+            case 'remove-from-favorites':
+                // Handle remove from favorites
+                const removeFavoriteResponse = await toggleFavorite(note.user_id!, note.id, false);
+                console.log('removeFavoriteResponse.id', removeFavoriteResponse);
+                break;
+            case 'share':
+                console.log('share');
+                break;
+            case 'delete':
+                // Show alert confirmation before delete
+                Alert.alert(
+                    'Delete Note',
+                    'Are you sure you want to delete this note?',
+                    [
+                        {
+                            text: 'Cancel',
+                            style: 'cancel',
+                        },
+                        {
+                            text: 'Delete',
+                            style: 'destructive',
+                            onPress: () => {
+                                // Handle delete logic here
+                            },
+                        },
+                    ],
+                    { cancelable: true }
+                );
+                break;
+            // Handle other actions...
+        }
+    }
+
     if (variant === 'grid') {
         return (
+            <ContextMenu
+                previewBackgroundColor='transparent'
+                actions={actions}
+                style={{ flex: 1 }}
+                onActionPress={onContextMenuActionPress}
+            >
+                <HapticButton
+                    hapticType="medium"
+                    ref={ref}
+                    onPress={() => onPress?.(note)}
+                    className={cn(noteItemVariants({ variant }), className)}
+                    {...props}
+                >
+                    <View className="gap-2">
+                        <View className={cn(noteIconVariants({ variant }), "bg-muted")}>
+                            {renderNoteIcon(note.type, 20, iconColor, note.status)}
+                        </View>
+                        <View className="gap-2">
+                            <View className="justify-center">
+                                <Text
+                                    variant="small"
+                                    className="font-semibold text-xs text-foreground text-start"
+                                    numberOfLines={2}
+                                >
+                                    {
+                                        note.status === 'running' ? <View className='gap-1 flex-col w-full'>
+                                            <Skeleton className="w-full h-3" />
+                                            <Skeleton className="w-full h-3" />
+                                        </View> : note.status === 'failed' ? <View className='gap-1 flex-col w-full'>
+                                            <Text
+                                                variant="small"
+                                                className="font-semibold text-xs text-foreground text-start"
+                                                numberOfLines={2}
+                                            >Something went wrong</Text>
+                                        </View> : (
+                                            note.title || 'Untitled Note'
+                                        )
+                                    }
+                                </Text>
+                            </View>
+                            <View className="h-px bg-border" />
+                        </View>
+
+                        <View className="gap-1">
+                            <Text className="text-muted-foreground text-xs">
+                                {displayDate} {displayTime}
+                            </Text>
+                            {(note.tag || note.folder_name) && (
+                                <View className="bg-muted px-2 py-1 rounded self-start">
+                                    <Text className="text-muted-foreground text-">
+                                        {note.tag || note.folder_name || note.type}
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
+                    </View>
+                </HapticButton>
+            </ContextMenu>
+
+        )
+    }
+
+    return (
+        <ContextMenu
+            style={{ flex: 1 }}
+            actions={actions}
+            onActionPress={onContextMenuActionPress}
+        >
             <HapticButton
                 hapticType="medium"
                 ref={ref}
@@ -153,98 +281,44 @@ export const NoteItem = React.forwardRef<
                 className={cn(noteItemVariants({ variant }), className)}
                 {...props}
             >
-                <View className="gap-2">
+                <View className="flex-row items-center gap-3">
                     <View className={cn(noteIconVariants({ variant }), "bg-muted")}>
                         {renderNoteIcon(note.type, 20, iconColor, note.status)}
                     </View>
-                    <View className="gap-2">
-                        <View className="justify-center">
-                            <Text
-                                variant="small"
-                                className="font-semibold text-xs text-foreground text-start"
-                                numberOfLines={2}
-                            >
-                                {
-                                    note.status === 'running' ? <View className='gap-1 flex-col w-full'>
-                                        <Skeleton className="w-full h-3" />
-                                        <Skeleton className="w-full h-3" />
-                                    </View> : note.status === 'failed' ? <View className='gap-1 flex-col w-full'>
-                                        <Text
-                                            variant="small"
-                                            className="font-semibold text-xs text-foreground text-start"
-                                            numberOfLines={2}
-                                        >Something went wrong</Text>
-                                    </View> : (
-                                        note.title || 'Untitled Note'
-                                    )
-                                }
-                            </Text>
-                        </View>
-                        <View className="h-px bg-border" />
-                    </View>
 
-                    <View className="gap-1">
-                        <Text className="text-muted-foreground text-xs">
-                            {displayDate} {displayTime}
+                    <View className="flex-1 flex-col gap-1">
+                        <Text variant="small" className="font-semibold  text-foreground text-start" numberOfLines={1}>
+                            {
+                                note.status === 'running' ? <View className='gap-1 flex-col w-full'>
+                                    <Skeleton className="w-full h-3" />
+                                </View> : note.status === 'failed' ? <View className='gap-1 flex-col w-full'>
+                                    <Text
+                                        variant="small"
+                                        className="font-semibold text-foreground text-start"
+                                        numberOfLines={1}
+                                    >Something went wrong</Text>
+                                </View> : (
+                                    note.title || 'Untitled Note'
+                                )
+                            }
                         </Text>
-                        {(note.tag || note.folder_name) && (
-                            <View className="bg-muted px-2 py-1 rounded self-start">
-                                <Text className="text-muted-foreground text-">
-                                    {note.tag || note.folder_name || note.type}
-                                </Text>
-                            </View>
-                        )}
+
+                        <View className="flex-row items-center gap-2">
+                            <Text className="text-muted-foreground text-xs">
+                                {displayDate} {displayTime}
+                            </Text>
+                            {(note.tag || note.folder_name) && (
+                                <View className="bg-muted px-2 py-1 rounded">
+                                    <Text className="text-muted-foreground text-xs">
+                                        {note.tag || note.folder_name || note.type}
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
                     </View>
                 </View>
             </HapticButton>
-        )
-    }
-
-    return (
-        <HapticButton
-            hapticType="medium"
-            ref={ref}
-            onPress={() => onPress?.(note)}
-            className={cn(noteItemVariants({ variant }), className)}
-            {...props}
-        >
-            <View className="flex-row items-center gap-3">
-                <View className={cn(noteIconVariants({ variant }), "bg-muted")}>
-                    {renderNoteIcon(note.type, 20, iconColor, note.status)}
-                </View>
-
-                <View className="flex-1 flex-col gap-1">
-                    <Text variant="small" className="font-semibold  text-foreground text-start" numberOfLines={1}>
-                        {
-                            note.status === 'running' ? <View className='gap-1 flex-col w-full'>
-                                <Skeleton className="w-full h-3" />
-                            </View> : note.status === 'failed' ? <View className='gap-1 flex-col w-full'>
-                                <Text
-                                    variant="small"
-                                    className="font-semibold text-foreground text-start"
-                                    numberOfLines={1}
-                                >Something went wrong</Text>
-                            </View> : (
-                                note.title || 'Untitled Note'
-                            )
-                        }
-                    </Text>
-
-                    <View className="flex-row items-center gap-2">
-                        <Text className="text-muted-foreground text-xs">
-                            {displayDate} {displayTime}
-                        </Text>
-                        {(note.tag || note.folder_name) && (
-                            <View className="bg-muted px-2 py-1 rounded">
-                                <Text className="text-muted-foreground text-xs">
-                                    {note.tag || note.folder_name || note.type}
-                                </Text>
-                            </View>
-                        )}
-                    </View>
-                </View>
-            </View>
-        </HapticButton>
+        </ContextMenu>
     )
 })
 

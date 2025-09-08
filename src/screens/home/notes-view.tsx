@@ -67,7 +67,7 @@ export default function NotesView({
                     isGridView={isGridView}
                     onNotePress={(note) => {
                         // TODO: Navigate to note detail
-                        console.log('Note pressed:', note)
+                        console.log('Note pressed:', note.title)
                     }}
                     emptyState={
                         debouncedQuery.trim() ? (

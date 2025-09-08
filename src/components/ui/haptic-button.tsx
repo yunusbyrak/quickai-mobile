@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, Pressable } from 'react-native';
 
-type HapticButtonProps = React.ComponentProps<typeof TouchableOpacity> & {
+type HapticButtonProps = React.ComponentProps<typeof Pressable> & {
     hapticType?: 'light' | 'medium' | 'heavy' | 'selection' | 'impact' | 'notification' | 'none';
     hapticEnabled?: boolean;
 };
@@ -44,7 +44,7 @@ function HapticButton({
     };
 
     return (
-        <TouchableOpacity
+        <Pressable
             onPress={handlePress}
             {...props}
         />

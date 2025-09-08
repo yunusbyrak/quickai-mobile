@@ -18,6 +18,7 @@ export { SvgIcon } from './ui/svg-icon';
 export { HapticButton, type HapticButtonProps } from './ui/haptic-button';
 export { SearchBar, type SearchBarProps } from './ui/search-bar';
 export { AnimatedTabs, type AnimatedTabsProps, type TabItem } from './ui/animated-tabs';
+export { ContextMenu, type ContextMenuProps, type ContextMenuAction } from './ui/context-menu';
 
 // Other components
 export { Container } from './Container';
