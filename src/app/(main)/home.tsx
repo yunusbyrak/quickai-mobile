@@ -30,7 +30,7 @@ export default function Home() {
             className='flex-1 bg-muted'
             style={{
                 paddingTop: Math.max(insets.top, 16),
-                // paddingBottom: Math.max(insets.bottom, 16),
+                paddingBottom: Math.max(insets.bottom, 16),
             }}
         >
 
