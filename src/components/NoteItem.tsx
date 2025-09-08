@@ -8,6 +8,8 @@ import type { Note } from '@/types/note'
 import React from 'react'
 import { Skeleton } from './ui/skeleton'
 import { HapticButton } from './ui/haptic-button'
+import { ContextMenu } from '@expo/ui/swift-ui';
+
 
 const noteItemVariants = cva('bg-card rounded-lg border border-border', {
     variants: {

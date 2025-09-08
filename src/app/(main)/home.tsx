@@ -1,13 +1,14 @@
-import { View, ScrollView, Pressable, Image, TouchableOpacity } from 'react-native'
+import { View, Image, TouchableOpacity, Pressable } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MaterialIcons, Ionicons } from '@expo/vector-icons'
 import { Text } from '@/components/ui/text'
-import { HapticButton } from '@/components'
-import { cn } from '@/lib/utils'
-import { useState } from 'react'
+import { HapticButton, AnimatedTabs, type TabItem } from '@/components'
 import { useRouter } from 'expo-router'
 import { useTheme } from '@/context/ThemeContext'
+import { cn } from '@/lib/utils'
+import { useState } from 'react'
 import NotesView from '@/screens/home/notes-view'
+import FoldersView from '@/screens/home/folders-view'
 
 
 export default function Home() {
@@ -15,8 +16,35 @@ export default function Home() {
     const router = useRouter()
     const { isDark } = useTheme()
 
-    const [activeTab, setActiveTab] = useState('All')
-    const tabs = ['All', 'Folders', 'Favorites']
+    const [activeTab, setActiveTab] = useState('all')
+
+    const tabs: TabItem[] = [
+        {
+            id: 'all',
+            label: 'All',
+            content: <NotesView />
+        },
+        {
+            id: 'folders',
+            label: 'Folders',
+            content: <FoldersView />
+        },
+        {
+            id: 'favorites',
+            label: 'Favorites',
+            content: (
+                <View className="flex-1 justify-center items-center p-4">
+                    <Text className="text-muted-foreground text-center">
+                        Favorites content coming soon...
+                    </Text>
+                </View>
+            )
+        }
+    ]
+
+    const handleTabChange = (tabId: string) => {
+        setActiveTab(tabId)
+    }
 
     return (
         <View
@@ -56,38 +84,51 @@ export default function Home() {
             </View>
 
             {/* Tab Navigation */}
-            <View className="px-4 pb-4">
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    className="flex-row"
-                >
+            <View className="px-4 pb-2">
+                <View className="flex-row">
                     {tabs.map((tab) => (
                         <Pressable
-                            key={tab}
-                            onPress={() => setActiveTab(tab)}
+                            key={tab.id}
+                            onPress={() => handleTabChange(tab.id)}
                             className={cn(
                                 "px-4 py-2 rounded-full border mr-1",
-                                activeTab === tab
+                                activeTab === tab.id
                                     ? "bg-foreground border-foreground"
                                     : "bg-background border-border"
                             )}
                         >
                             <Text className={cn(
                                 "text-sm font-medium",
-                                activeTab === tab
+                                activeTab === tab.id
                                     ? "text-background"
                                     : "text-muted-foreground"
                             )}>
-                                {tab}
+                                {tab.label}
                             </Text>
                         </Pressable>
                     ))}
-                </ScrollView>
+                </View>
             </View>
 
-            {/* TODO notes-view */}
-            <NotesView />
+            {/* Tab Content */}
+            <View className="flex-1">
+                <AnimatedTabs
+                    tabs={tabs}
+                    activeTab={activeTab}
+                    onTabChange={handleTabChange}
+                    enableSwipe={true}
+                    swipeThreshold={50}
+                    swipeChangeThreshold={0.6}
+                    contentOnly={true}
+                    className="flex-1"
+                    contentClassName="rounded-lg"
+                    animationConfig={{
+                        duration: 250,
+                        damping: 25,
+                        stiffness: 300,
+                    }}
+                />
+            </View>
 
             {/* Bottom Navigation */}
             <View className="flex-row items-center justify-center px-4 pt-4 bg-transparent absolute bottom-10 right-0 left-0">
