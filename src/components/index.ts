@@ -15,6 +15,8 @@ export { PreviewContent } from './audio/PreviewContent';
 
 // UI Components
 export { SvgIcon } from './ui/svg-icon';
+export { HapticButton, type HapticButtonProps } from './ui/haptic-button';
+export { SearchBar, type SearchBarProps } from './ui/search-bar';
 
 // Other components
 export { Container } from './Container';

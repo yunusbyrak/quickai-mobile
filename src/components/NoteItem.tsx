@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable, View } from 'react-native'
+import { ActivityIndicator, Pressable, TouchableOpacity, View } from 'react-native'
 import { MaterialIcons } from '@expo/vector-icons'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { Text } from '@/components/ui/text'
@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import type { Note } from '@/types/note'
 import React from 'react'
 import { Skeleton } from './ui/skeleton'
+import { HapticButton } from './ui/haptic-button'
 
 const noteItemVariants = cva('bg-card rounded-lg border border-border', {
     variants: {
@@ -134,7 +135,7 @@ const formatTime = (dateString: string | null): string => {
 }
 
 export const NoteItem = React.forwardRef<
-    React.ElementRef<typeof Pressable>,
+    React.ElementRef<typeof TouchableOpacity>,
     NoteItemProps
 >(({ note, onPress, variant, className, gridColumns, ...props }, ref) => {
     const displayDate = note.displayDate || formatDate(note.created_at)
@@ -143,7 +144,8 @@ export const NoteItem = React.forwardRef<
 
     if (variant === 'grid') {
         return (
-            <Pressable
+            <HapticButton
+                hapticType="medium"
                 ref={ref}
                 onPress={() => onPress?.(note)}
                 className={cn(noteItemVariants({ variant }), className)}
@@ -192,12 +194,13 @@ export const NoteItem = React.forwardRef<
                         )}
                     </View>
                 </View>
-            </Pressable>
+            </HapticButton>
         )
     }
 
     return (
-        <Pressable
+        <HapticButton
+            hapticType="medium"
             ref={ref}
             onPress={() => onPress?.(note)}
             className={cn(noteItemVariants({ variant }), className)}
@@ -239,7 +242,7 @@ export const NoteItem = React.forwardRef<
                     </View>
                 </View>
             </View>
-        </Pressable>
+        </HapticButton>
     )
 })
 
