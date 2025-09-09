@@ -136,4 +136,9 @@ export const debug = {
       storage.state.delete('folder-store');
       console.log('Cleared folder store');
     },
+
+    clearNotesStore: () => {
+      storage.state.delete('notes-store');
+      console.log('Cleared notes store');
+    },
   };

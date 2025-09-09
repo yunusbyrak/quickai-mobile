@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { HapticButton, NotesList, SearchBar } from '@/components'
-import { Note, useNotes } from '@/hooks/useNotes'
+import { useNotes } from '@/hooks/useNotes'
+import type { Note } from '@/types/note'
 import { useSearch } from '@/hooks/useSearch'
 import { searchNotes } from '@/utils/search'
 import { supabase } from '@/lib/supabase'

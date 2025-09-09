@@ -1,18 +1,12 @@
-import { useEffect, useState, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { MMKV } from 'react-native-mmkv';
+import { useEffect, useCallback, useMemo } from 'react';
 import type { Note } from '@/types/note';
-import { supabase } from '@/lib/supabase';
-
-const storage = new MMKV();
-const NOTES_CACHE_KEY = 'notes_cache';
+import { useNotesStore, useNotesActions, useNotesData } from '@/store/notes';
 
 interface UseNotesOptions {
     folderId?: string | null;
     favorite?: boolean;
+    autoFetch?: boolean; // Whether to auto-fetch on mount
 }
-
-// TODO notes disappear after adding to folder
 
 interface UseNotesResult {
     notes: Note[];
@@ -23,161 +17,37 @@ interface UseNotesResult {
     updateNoteFavorite: (noteId: string, favorite: boolean) => Promise<void>;
 }
 
-function getNotesFromCache(): Note[] {
-    const cached = storage.getString(NOTES_CACHE_KEY);
-    if (!cached) return [];
-    try {
-        return JSON.parse(cached) as Note[];
-    } catch {
-        return [];
-    }
-}
-
-function setNotesToCache(notes: Note[]) {
-    storage.set(NOTES_CACHE_KEY, JSON.stringify(notes));
-}
-
-function filterNotes(notes: Note[], folderId?: string | null, favorite?: boolean): Note[] {
-    return notes.filter(note => {
-        // Filter by folder_id
-        if (folderId !== undefined) {
-            if (folderId === null && note.folder_id !== null) return false;
-            if (folderId !== null && note.folder_id !== folderId) return false;
-        }
-
-        // Filter by favorite
-        if (favorite !== undefined && note.favorite !== favorite) return false;
-
-        return true;
-    });
-}
-
 export const useNotes = (options?: UseNotesOptions): UseNotesResult => {
-    const { folderId, favorite } = options || {};
-    const [allNotes, setAllNotes] = useState<Note[]>(getNotesFromCache());
-    const [loading, setLoading] = useState<boolean>(allNotes.length === 0);
-    const [error, setError] = useState<string | null>(null);
+    const { folderId, favorite, autoFetch = true } = options || {};
 
-    // Filter notes based on options
-    const notes = filterNotes(allNotes, folderId, favorite);
+    // Get data from store
+    const { notes: allNotes, loading, error, initialized } = useNotesData();
 
-    const fetchNotes = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const { data, error: supabaseError } = await supabase
-                .from('notes')
-                .select()
-                .order('created_at', { ascending: false });
+    // Get actions from store
+    const actions = useNotesActions();
 
-            if (supabaseError) {
-                throw supabaseError;
-            }
+    // Filter notes based on options using the store's filtering method
+    const notes = useMemo(() => {
+        return actions.getFilteredNotes(folderId, favorite);
+    }, [allNotes, folderId, favorite, actions.getFilteredNotes]);
 
-            if (data) {
-                setAllNotes(data as Note[]);
-                setNotesToCache(data as Note[]);
-            }
-        } catch (err: any) {
-            setError(err.message || 'Failed to fetch notes');
-            // Always load from cache synchronously if error
-            setAllNotes(getNotesFromCache());
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const deleteNote = useCallback(async (noteId: string) => {
-        const {data, error: supabaseError} = await supabase
-            .from('notes')
-            .delete()
-            .eq('id', noteId);
-
-        if (supabaseError) {
-            throw supabaseError;
-        }
-
-        setAllNotes(allNotes.filter(note => note.id !== noteId));
-            setNotesToCache(allNotes.filter(note => note.id !== noteId));
-    }, []);
-
-    const updateNoteFavorite = useCallback(async (noteId: string, favorite: boolean) => {
-        const {data, error: supabaseError} = await supabase
-            .from('notes')
-            .update({ favorite: favorite })
-            .eq('id', noteId);
-
-        if (supabaseError) {
-            throw supabaseError;
-        }
-
-        setAllNotes(allNotes.map(note => note.id === noteId ? { ...note, favorite: favorite } : note));
-        setNotesToCache(allNotes.map(note => note.id === noteId ? { ...note, favorite: favorite } : note));
-    }, []);
-
-    // Subscribe to realtime changes
+    // Initialize store and fetch data if needed
     useEffect(() => {
-        fetchNotes();
+        if (autoFetch && !initialized) {
+            actions.fetchNotes();
+        }
 
-        const channel = supabase
-            .channel('public:notes')
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'notes' },
-                (payload) => {
-                    // Update cached notes directly based on the change
-                    const { eventType, new: newRecord, old: oldRecord } = payload;
-
-                    setAllNotes(currentNotes => {
-                        let updatedNotes = [...currentNotes];
-
-                        switch (eventType) {
-                            case 'INSERT':
-                                if (newRecord) {
-                                    updatedNotes.unshift(newRecord as Note);
-                                }
-                                break;
-                            case 'UPDATE':
-                                if (newRecord) {
-                                    const index = updatedNotes.findIndex(note => note.id === newRecord.id);
-                                    if (index !== -1) {
-                                        updatedNotes[index] = newRecord as Note;
-                                    }
-                                }
-                                break;
-                            case 'DELETE':
-                                if (oldRecord) {
-                                    updatedNotes = updatedNotes.filter(note => note.id !== oldRecord.id);
-                                }
-                                break;
-                        }
-
-                        // Update cache with new notes
-                        setNotesToCache(updatedNotes);
-                        return updatedNotes;
-                    });
-                }
-            )
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [fetchNotes]);
-
-    // Keep notes state in sync with MMKV cache if it changes externally
-    useEffect(() => {
-        // MMKV does not have a native event system, but if you add one, sync here.
-        // For now, this is a placeholder for future sync logic.
-    }, []);
+        // Ensure realtime is initialized
+        actions.initializeRealtime();
+    }, [autoFetch, initialized, actions.fetchNotes, actions.initializeRealtime]);
 
     return {
         notes,
         loading,
         error,
-        refresh: fetchNotes,
-        deleteNote,
-        updateNoteFavorite
+        refresh: actions.refresh,
+        deleteNote: actions.deleteNote,
+        updateNoteFavorite: actions.updateNoteFavorite,
     };
 };
 
