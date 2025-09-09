@@ -9,8 +9,10 @@ import type { Folder } from "@/types/folder";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useMemo, useState } from "react";
 import { View, Alert, Platform } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function FoldersView() {
+    const router = useRouter()
     const [isGridView, setIsGridView] = useState(false)
     const { query, debouncedQuery, setQuery, clearSearch, isSearching } = useSearch({
         debounceMs: 300,
@@ -57,8 +59,10 @@ export default function FoldersView() {
                         }
                     ]
                 );
+            } else {
+                // Android: Navigate to edit modal
+                router.push(`/(main)/folders/folder-edit?folderId=${folderId}`);
             }
-            // TODO implement for the android platform
         } catch (error) {
             Alert.alert('Error', 'Failed to edit folder')
         }
@@ -84,8 +88,10 @@ export default function FoldersView() {
                         }
                     ]
                 );
+            } else {
+                // Android: Navigate to create modal
+                router.push('/(main)/folders/folder-create');
             }
-            // TODO implement for the android platform
         } catch (error) {
             Alert.alert('Error', 'Failed to create folder')
         }
@@ -107,7 +113,7 @@ export default function FoldersView() {
                     <HapticButton
                         hapticType="medium"
                         onPress={() => setIsGridView(!isGridView)}
-                        className="w-12 h-12 bg-background border border-border rounded-lg items-center justify-center"
+                        className="w-12 h-12 bg-background border border-border rounded-full items-center justify-center"
                     >
                         <Ionicons
                             name={isGridView ? "menu-outline" : "grid-outline"}

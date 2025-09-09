@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { ScrollView, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { Text } from '@/components/ui/text'
+import { useRouter } from 'expo-router'
 
 interface NotesViewProps {
     folderId?: string | null,
@@ -17,7 +18,7 @@ export default function NotesView({
     folderId,
     favorite
 }: NotesViewProps) {
-
+    const router = useRouter()
     const [isGridView, setIsGridView] = useState(false)
     const { notes, loading, error, refresh, deleteNote, updateNoteFavorite } = useNotes({ folderId: null })
 
@@ -52,8 +53,7 @@ export default function NotesView({
     }
 
     const onNoteAddToCategory = (noteId: string) => {
-        // TODO: Add note to category
-        console.log('Note added to category:', noteId)
+        router.push(`/(main)/notes/note-add-folder?noteId=${noteId}`);
     }
 
     return (
@@ -72,7 +72,7 @@ export default function NotesView({
                     <HapticButton
                         hapticType="medium"
                         onPress={() => setIsGridView(!isGridView)}
-                        className="w-12 h-12 bg-background border border-border rounded-lg items-center justify-center"
+                        className="w-12 h-12 bg-background border border-border rounded-full items-center justify-center"
                     >
                         <Ionicons
                             name={isGridView ? "menu-outline" : "grid-outline"}

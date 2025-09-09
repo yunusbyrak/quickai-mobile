@@ -16,6 +16,18 @@ export default function Layout() {
                         presentation: 'modal',
                     }}
                 />
+                <Stack.Screen
+                    name="folders/folder-create"
+                    options={{
+                        presentation: 'modal',
+                    }}
+                />
+                <Stack.Screen
+                    name="folders/folder-edit"
+                    options={{
+                        presentation: 'modal',
+                    }}
+                />
             </Stack>
         </View>
     )

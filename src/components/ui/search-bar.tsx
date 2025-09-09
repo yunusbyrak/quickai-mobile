@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const searchBarVariants = cva(
-  'flex-row items-center bg-background border border-border rounded-lg px-3 py-3 gap-3',
+  'flex-row items-center bg-background border border-border rounded-full px-3 py-3 gap-3',
   {
     variants: {
       size: {

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { MMKV } from 'react-native-mmkv';
 import type { Folder, CreateFolderInput, UpdateFolderInput } from '@/types/folder';
 import { supabase } from '@/lib/supabase';
@@ -145,55 +146,67 @@ export const useFolders = (options?: UseFoldersOptions): UseFoldersResult => {
         }
     }, []);
 
-    // Subscribe to realtime changes
-    useEffect(() => {
-        fetchFolders();
+    // Subscribe to realtime changes and refetch when component comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            // Fetch folders when component comes into focus
+            fetchFolders();
 
-        const channel = supabase
-            .channel('public:folders')
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'folders' },
-                (payload) => {
-                    // Update cached folders directly based on the change
-                    const { eventType, new: newRecord, old: oldRecord } = payload;
+            const channel = supabase
+                .channel('public:folders')
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'folders' },
+                    (payload) => {
+                        // Update cached folders directly based on the change
+                        const { eventType, new: newRecord, old: oldRecord } = payload;
 
-                    setFolders(currentFolders => {
-                        let updatedFolders = [...currentFolders];
+                        setFolders(currentFolders => {
+                            let updatedFolders = [...currentFolders];
 
-                        switch (eventType) {
-                            case 'INSERT':
-                                if (newRecord) {
-                                    updatedFolders.unshift(newRecord as Folder);
-                                }
-                                break;
-                            case 'UPDATE':
-                                if (newRecord) {
-                                    const index = updatedFolders.findIndex(folder => folder.id === newRecord.id);
-                                    if (index !== -1) {
-                                        updatedFolders[index] = newRecord as Folder;
+                            switch (eventType) {
+                                case 'INSERT':
+                                    if (newRecord) {
+                                        // Check if folder already exists to avoid duplicates
+                                        const exists = updatedFolders.some(folder => folder.id === newRecord.id);
+                                        if (!exists) {
+                                            updatedFolders.unshift(newRecord as Folder);
+                                        }
                                     }
-                                }
-                                break;
-                            case 'DELETE':
-                                if (oldRecord) {
-                                    updatedFolders = updatedFolders.filter(folder => folder.id !== oldRecord.id);
-                                }
-                                break;
-                        }
+                                    break;
+                                case 'UPDATE':
+                                    if (newRecord) {
+                                        const index = updatedFolders.findIndex(folder => folder.id === newRecord.id);
+                                        if (index !== -1) {
+                                            updatedFolders[index] = newRecord as Folder;
+                                        } else {
+                                            // If folder not found in current list, add it
+                                            updatedFolders.unshift(newRecord as Folder);
+                                        }
+                                    }
+                                    break;
+                                case 'DELETE':
+                                    if (oldRecord) {
+                                        updatedFolders = updatedFolders.filter(folder => folder.id !== oldRecord.id);
+                                    }
+                                    break;
+                            }
 
-                        // Update cache with new folders
-                        setFoldersToCache(updatedFolders);
-                        return updatedFolders;
-                    });
-                }
-            )
-            .subscribe();
+                            // Update cache with new folders
+                            setFoldersToCache(updatedFolders);
+                            return updatedFolders;
+                        });
+                    }
+                )
+                .subscribe((status) => {
+                    console.log('Realtime subscription status:', status);
+                });
 
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [fetchFolders]);
+            return () => {
+                supabase.removeChannel(channel);
+            };
+        }, [fetchFolders])
+    );
 
     return {
         folders,

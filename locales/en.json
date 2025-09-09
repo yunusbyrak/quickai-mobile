@@ -1,3 +1,33 @@
 {
-    "welcome": "Welcome"
+    "welcome": "Welcome",
+    "common": {
+        "error": "Error",
+        "ok": "OK",
+        "cancel": "Cancel",
+        "create": "Create",
+        "creating": "Creating...",
+        "update": "Update",
+        "updating": "Updating...",
+        "loading": "Loading...",
+        "goBack": "Go Back",
+        "characters": "characters"
+    },
+    "folder": {
+        "createNew": "Create New Folder",
+        "createDescription": "Organize your notes with a new folder",
+        "editFolder": "Edit Folder",
+        "editDescription": "Update your folder details",
+        "title": "Title",
+        "titlePlaceholder": "Enter folder name",
+        "titleRequired": "Title is required",
+        "titleTooShort": "Title must be at least 2 characters",
+        "titleTooLong": "Title must be less than 50 characters",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter folder description (optional)",
+        "descriptionTooLong": "Description must be less than 200 characters",
+        "createError": "Failed to create folder. Please try again.",
+        "updateError": "Failed to update folder. Please try again.",
+        "notFound": "Folder not found",
+        "notFoundDescription": "The folder you're looking for doesn't exist or has been deleted."
+    }
 }
