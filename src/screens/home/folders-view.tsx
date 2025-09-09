@@ -28,8 +28,7 @@ export default function FoldersView() {
     }, [folders, debouncedQuery])
 
     const handleFolderPress = (folder: Folder) => {
-        // Navigate to folder contents or handle folder selection
-        console.log('Folder pressed:', folder.title)
+        router.push(`/(main)/folders/folder-detail?folderId=${folder.id}`)
     }
 
     const handleFolderDelete = async (folderId: string) => {

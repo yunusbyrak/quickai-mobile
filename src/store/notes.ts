@@ -160,13 +160,65 @@ export const useNotesStore = create<NotesState>()(
                 try {
                     set({ error: null });
 
-                    const { error: supabaseError } = await supabase
+                    // Get the current note to find the old folder_id BEFORE updating
+                    const { data: currentNote } = await supabase
+                        .from('notes')
+                        .select('folder_id')
+                        .eq('id', noteId)
+                        .single();
+
+                    const oldFolderId = currentNote?.folder_id;
+
+                    const { data, error: supabaseError } = await supabase
                         .from('notes')
                         .update({ folder_id: folderId })
-                        .eq('id', noteId);
+                        .eq('id', noteId).select().single();
 
                     if (supabaseError) {
                         throw supabaseError;
+                    }
+
+                    // Update folder counts
+                    // Decrement count for the old folder (if it existed)
+                    if (oldFolderId) {
+                        const { data: oldFolder } = await supabase
+                            .from('folders')
+                            .select('count')
+                            .eq('id', oldFolderId)
+                            .single();
+
+                        if (oldFolder) {
+                            const newCount = Math.max((oldFolder.count || 0) - 1, 0);
+                            const { error: folderError } = await supabase
+                                .from('folders')
+                                .update({ count: newCount })
+                                .eq('id', oldFolderId);
+
+                            if (folderError) {
+                                console.error('Failed to update old folder count:', folderError);
+                            }
+                        }
+                    }
+
+                    // Increment count for the new folder (if provided)
+                    if (folderId) {
+                        const { data: newFolder } = await supabase
+                            .from('folders')
+                            .select('count')
+                            .eq('id', folderId)
+                            .single();
+
+                        if (newFolder) {
+                            const newCount = (newFolder.count || 0) + 1;
+                            const { error: folderError } = await supabase
+                                .from('folders')
+                                .update({ count: newCount })
+                                .eq('id', folderId);
+
+                            if (folderError) {
+                                console.error('Failed to update new folder count:', folderError);
+                            }
+                        }
                     }
 
                     // Fetch folder name if folderId is provided
