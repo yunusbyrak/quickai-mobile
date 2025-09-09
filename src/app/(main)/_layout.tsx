@@ -28,6 +28,12 @@ export default function Layout() {
                         presentation: 'modal',
                     }}
                 />
+                <Stack.Screen
+                    name="notes/note-add-folder"
+                    options={{
+                        presentation: 'modal',
+                    }}
+                />
             </Stack>
         </View>
     )

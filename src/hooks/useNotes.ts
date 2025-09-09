@@ -12,6 +12,8 @@ interface UseNotesOptions {
     favorite?: boolean;
 }
 
+// TODO notes disappear after adding to folder
+
 interface UseNotesResult {
     notes: Note[];
     loading: boolean;

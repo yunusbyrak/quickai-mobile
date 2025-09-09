@@ -45,6 +45,7 @@ function HapticButton({
 
     return (
         <TouchableOpacity
+            activeOpacity={0.7}
             onPress={handlePress}
             {...props}
         />
