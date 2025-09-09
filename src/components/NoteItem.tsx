@@ -40,7 +40,7 @@ export interface NoteItemProps extends VariantProps<typeof noteItemVariants> {
     onDelete?: (noteId: string) => void
     onFavorite?: (noteId: string, favorite: boolean) => void
     onShare?: (noteId: string) => void
-    onAddToCategory?: (noteId: string) => void
+    onAddToCategory?: (noteId: string, remove: boolean) => void
     className?: string
     gridColumns?: number
 }
@@ -154,14 +154,14 @@ export const NoteItem = React.forwardRef<
             systemIcon: note.favorite ? 'heart.fill' : 'heart',
         },
         {
+            id: note.folder_id ? 'remove-from-folder' : 'add-to-folder',
+            title: note.folder_id ? 'Remove from Folder' : 'Add to Folder',
+            systemIcon: note.folder_id ? 'folder.fill' : 'folder',
+        },
+        {
             id: 'share',
             title: 'Share',
             systemIcon: 'square.and.arrow.up',
-        },
-        {
-            id: 'add-to-category',
-            title: 'Add to Category',
-            systemIcon: 'folder',
         },
         {
             id: 'delete',
@@ -182,8 +182,11 @@ export const NoteItem = React.forwardRef<
             case 'share':
                 onShare?.(note.id)
                 break;
-            case 'add-to-category':
-                onAddToCategory?.(note.id)
+            case 'add-to-folder':
+                onAddToCategory?.(note.id, false)
+                break;
+            case 'remove-from-folder':
+                onAddToCategory?.(note.id, true)
                 break;
             case 'delete':
                 Alert.alert(

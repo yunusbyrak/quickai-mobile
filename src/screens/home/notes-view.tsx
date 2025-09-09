@@ -21,7 +21,7 @@ export default function NotesView({
 }: NotesViewProps) {
     const router = useRouter()
     const [isGridView, setIsGridView] = useState(false)
-    const { notes, loading, error, refresh, deleteNote, updateNoteFavorite } = useNotes({
+    const { notes, loading, error, refresh, deleteNote, updateNoteFavorite, updateNoteFolder } = useNotes({
         folderId,
         favorite
     })
@@ -56,8 +56,12 @@ export default function NotesView({
         console.log('Note shared:', noteId)
     }
 
-    const onNoteAddToCategory = (noteId: string) => {
-        router.push(`/(main)/notes/note-add-folder?noteId=${noteId}`);
+    const onNoteAddToCategory = (noteId: string, remove: boolean) => {
+        if (remove) {
+            updateNoteFolder(noteId, null)
+        } else {
+            router.push(`/(main)/notes/note-add-folder?noteId=${noteId}`);
+        }
     }
 
     return (

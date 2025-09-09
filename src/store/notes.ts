@@ -210,7 +210,7 @@ export const useNotesStore = create<NotesState>()(
                         'postgres_changes',
                         { event: '*', schema: 'public', table: 'notes' },
                         (payload) => {
-                            console.log('Notes realtime event:', payload.eventType, payload);
+                            // console.log('Notes realtime event:', payload.eventType, payload);
 
                             const { eventType, new: newRecord, old: oldRecord } = payload;
                             const currentState = get();

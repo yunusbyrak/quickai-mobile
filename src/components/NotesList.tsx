@@ -12,7 +12,7 @@ export interface NotesListProps {
     onNoteDelete?: (noteId: string) => void
     onNoteFavorite?: (noteId: string, favorite: boolean) => void
     onNoteShare?: (noteId: string) => void
-    onNoteAddToCategory?: (noteId: string) => void
+    onNoteAddToCategory?: (noteId: string, remove: boolean) => void
     isGridView?: boolean
     className?: string
     emptyState?: React.ReactNode
