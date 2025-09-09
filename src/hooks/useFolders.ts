@@ -1,16 +1,12 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { MMKV } from 'react-native-mmkv';
 import type { Folder, CreateFolderInput, UpdateFolderInput } from '@/types/folder';
-import { supabase } from '@/lib/supabase';
+import { useFolderStore, useFolderActions, useFolderData } from '@/store/folder';
 import { useProfile } from './useProfile';
-import { TablesInsert } from '@/types/database';
-
-const storage = new MMKV();
-const FOLDERS_CACHE_KEY = 'folders_cache';
 
 interface UseFoldersOptions {
     // Add any filtering options if needed in the future
+    autoFetch?: boolean; // Whether to auto-fetch on mount/focus
 }
 
 interface UseFoldersResult {
@@ -23,199 +19,50 @@ interface UseFoldersResult {
     deleteFolder: (folderId: string) => Promise<void>;
 }
 
-function getFoldersFromCache(): Folder[] {
-    const cached = storage.getString(FOLDERS_CACHE_KEY);
-    if (!cached) return [];
-    try {
-        return JSON.parse(cached) as Folder[];
-    } catch {
-        return [];
-    }
-}
-
-function setFoldersToCache(folders: Folder[]) {
-    storage.set(FOLDERS_CACHE_KEY, JSON.stringify(folders));
-}
-
 export const useFolders = (options?: UseFoldersOptions): UseFoldersResult => {
-    const [folders, setFolders] = useState<Folder[]>(getFoldersFromCache());
-    const [loading, setLoading] = useState<boolean>(folders.length === 0);
-    const [error, setError] = useState<string | null>(null);
+    const { autoFetch = true } = options || {};
     const { profile } = useProfile();
 
-    const fetchFolders = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const { data, error: supabaseError } = await supabase
-                .from('folders')
-                .select('*') // Includes count field from database
-                .order('created_at', { ascending: false });
+    // Get data from store
+    const { folders, loading, error, initialized } = useFolderData();
 
-            if (supabaseError) {
-                throw supabaseError;
-            }
+    // Get actions from store
+    const actions = useFolderActions();
 
-            if (data) {
-                setFolders(data as Folder[]);
-                setFoldersToCache(data as Folder[]);
-            }
-        } catch (err: any) {
-            setError(err.message || 'Failed to fetch folders');
-            // Always load from cache synchronously if error
-            setFolders(getFoldersFromCache());
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
+    // Wrapper for createFolder to inject user ID
     const createFolder = useCallback(async (folderInput: CreateFolderInput): Promise<Folder | null> => {
-        try {
-            const insertData: TablesInsert<'folders'> = {
-                user_id: profile?.id,
-                title: folderInput.title,
-                description: null
-            }
-            const { data, error: supabaseError } = await supabase
-                .from('folders')
-                .insert([insertData])
-                .select()
-                .single();
+        return actions.createFolder(folderInput, profile?.id);
+    }, [actions.createFolder, profile?.id]);
 
-            if (supabaseError) {
-                throw supabaseError;
-            }
-        } catch (err: any) {
-            console.log(err);
-            setError(err.message || 'Failed to create folder');
-            throw err;
+    // Initialize store and fetch data if needed
+    useEffect(() => {
+        if (autoFetch && !initialized) {
+            actions.fetchFolders();
         }
-        return null;
-    }, []);
 
-    const updateFolder = useCallback(async (folderId: string, updates: UpdateFolderInput) => {
-        try {
-            const { data, error: supabaseError } = await supabase
-                .from('folders')
-                .update({
-                    ...updates
-                })
-                .eq('id', folderId)
-                .select()
-                .single();
+        // Ensure realtime is initialized
+        actions.initializeRealtime();
+    }, [autoFetch, initialized, actions.fetchFolders, actions.initializeRealtime]);
 
-            if (supabaseError) {
-                throw supabaseError;
-            }
-
-            if (data) {
-                const updatedFolder = data as Folder;
-                setFolders(currentFolders => {
-                    const updated = currentFolders.map(folder =>
-                        folder.id === folderId ? updatedFolder : folder
-                    );
-                    setFoldersToCache(updated);
-                    return updated;
-                });
-            }
-        } catch (err: any) {
-            setError(err.message || 'Failed to update folder');
-            throw err;
-        }
-    }, []);
-
-    const deleteFolder = useCallback(async (folderId: string) => {
-        try {
-            const { error: supabaseError } = await supabase
-                .from('folders')
-                .delete()
-                .eq('id', folderId);
-
-            if (supabaseError) {
-                throw supabaseError;
-            }
-
-            setFolders(currentFolders => {
-                const updated = currentFolders.filter(folder => folder.id !== folderId);
-                setFoldersToCache(updated);
-                return updated;
-            });
-        } catch (err: any) {
-            setError(err.message || 'Failed to delete folder');
-            throw err;
-        }
-    }, []);
-
-    // Subscribe to realtime changes and refetch when component comes into focus
+    // Optionally refetch when component comes into focus
     useFocusEffect(
         useCallback(() => {
-            // Fetch folders when component comes into focus
-            fetchFolders();
-
-            const channel = supabase
-                .channel('public:folders')
-                .on(
-                    'postgres_changes',
-                    { event: '*', schema: 'public', table: 'folders' },
-                    (payload) => {
-                        // Update cached folders directly based on the change
-                        const { eventType, new: newRecord, old: oldRecord } = payload;
-
-                        setFolders(currentFolders => {
-                            let updatedFolders = [...currentFolders];
-
-                            switch (eventType) {
-                                case 'INSERT':
-                                    if (newRecord) {
-                                        // Check if folder already exists to avoid duplicates
-                                        const exists = updatedFolders.some(folder => folder.id === newRecord.id);
-                                        if (!exists) {
-                                            updatedFolders.unshift(newRecord as Folder);
-                                        }
-                                    }
-                                    break;
-                                case 'UPDATE':
-                                    if (newRecord) {
-                                        const index = updatedFolders.findIndex(folder => folder.id === newRecord.id);
-                                        if (index !== -1) {
-                                            updatedFolders[index] = newRecord as Folder;
-                                        } else {
-                                            // If folder not found in current list, add it
-                                            updatedFolders.unshift(newRecord as Folder);
-                                        }
-                                    }
-                                    break;
-                                case 'DELETE':
-                                    if (oldRecord) {
-                                        updatedFolders = updatedFolders.filter(folder => folder.id !== oldRecord.id);
-                                    }
-                                    break;
-                            }
-
-                            // Update cache with new folders
-                            setFoldersToCache(updatedFolders);
-                            return updatedFolders;
-                        });
-                    }
-                )
-                .subscribe((status) => {
-                    console.log('Realtime subscription status:', status);
-                });
-
-            return () => {
-                supabase.removeChannel(channel);
-            };
-        }, [fetchFolders])
+            if (autoFetch) {
+                // Only refresh if data is stale or if explicitly requested
+                // You can add staleness logic here if needed
+                actions.refresh();
+            }
+        }, [autoFetch, actions.refresh])
     );
 
     return {
         folders,
         loading,
         error,
-        refresh: fetchFolders,
+        refresh: actions.refresh,
         createFolder,
-        updateFolder,
-        deleteFolder
+        updateFolder: actions.updateFolder,
+        deleteFolder: actions.deleteFolder,
     };
 };
 

@@ -126,4 +126,14 @@ export const debug = {
     clearAll: () => {
       Object.values(storage).forEach(instance => instance.clearAll());
     },
+
+    clearState: () => {
+      storage.state.clearAll();
+      console.log('Cleared all state storage');
+    },
+
+    clearFolderStore: () => {
+      storage.state.delete('folder-store');
+      console.log('Cleared folder store');
+    },
   };
