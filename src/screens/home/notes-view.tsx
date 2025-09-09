@@ -21,7 +21,10 @@ export default function NotesView({
 }: NotesViewProps) {
     const router = useRouter()
     const [isGridView, setIsGridView] = useState(false)
-    const { notes, loading, error, refresh, deleteNote, updateNoteFavorite } = useNotes({ folderId: null })
+    const { notes, loading, error, refresh, deleteNote, updateNoteFavorite } = useNotes({
+        folderId,
+        favorite
+    })
 
     // Search functionality with debouncing
     const { query, debouncedQuery, setQuery, clearSearch, isSearching } = useSearch({

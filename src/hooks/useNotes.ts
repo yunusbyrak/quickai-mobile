@@ -15,6 +15,7 @@ interface UseNotesResult {
     refresh: () => Promise<void>;
     deleteNote: (noteId: string) => Promise<void>;
     updateNoteFavorite: (noteId: string, favorite: boolean) => Promise<void>;
+    updateNoteFolder: (noteId: string, folderId: string | null) => Promise<void>;
 }
 
 export const useNotes = (options?: UseNotesOptions): UseNotesResult => {
@@ -48,6 +49,7 @@ export const useNotes = (options?: UseNotesOptions): UseNotesResult => {
         refresh: actions.refresh,
         deleteNote: actions.deleteNote,
         updateNoteFavorite: actions.updateNoteFavorite,
+        updateNoteFolder: actions.updateNoteFolder,
     };
 };
 

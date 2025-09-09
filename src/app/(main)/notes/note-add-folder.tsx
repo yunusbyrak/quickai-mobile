@@ -10,10 +10,12 @@ import { cn } from "@/lib/utils";
 import { useSearch } from "@/hooks/useSearch";
 import type { Folder } from "@/types/folder";
 import { HapticButton } from "@/components";
+import { useNotes } from "@/hooks/useNotes";
 
 export default function NoteAddFolder() {
     const { noteId } = useLocalSearchParams<{ noteId: string }>();
     const { folders } = useFolders();
+    const { updateNoteFolder } = useNotes();
     const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
     const [isGridView, setIsGridView] = useState(false);
 
@@ -36,8 +38,8 @@ export default function NoteAddFolder() {
 
     const handleSaveChanges = () => {
         console.log('Selected folder:', selectedFolder);
-        // TODO: Implement save logic
-        // updateNoteFolder(noteId, selectedFolder as string);
+        if (!selectedFolder) return;
+        updateNoteFolder(noteId, selectedFolder as string);
         router.back();
     };
 
