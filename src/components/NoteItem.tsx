@@ -261,8 +261,8 @@ export const NoteItem = React.forwardRef<
                                 {displayDate} {displayTime}
                             </Text>
                             {(note.tag || note.folder_name) && (
-                                <View className="bg-muted px-2 py-1 rounded self-start">
-                                    <Text className="text-muted-foreground text-">
+                                <View className="bg-muted-foreground/15 px-2 py-1 rounded-full self-start">
+                                    <Text variant="small" className="text-muted-foreground/75 text-xs">
                                         {note.tag || note.folder_name || note.type}
                                     </Text>
                                 </View>
