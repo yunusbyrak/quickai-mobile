@@ -97,13 +97,13 @@ export default function FolderDetail() {
                     </Text>
                 </View>
                 <ContextMenu
+                    dropdownMenuMode
                     previewBackgroundColor='transparent'
                     actions={actions}
                     onActionPress={onContextMenuActionPress}
                 >
                     <HapticButton
                         hapticType="medium"
-                        onPress={() => router.push('/settings')}
                         className="w-10 h-10 rounded-full items-center justify-center"
                         accessibilityRole="button"
                         accessibilityLabel="Settings"

@@ -39,8 +39,7 @@ export default function NotesView({
     }, [notes, debouncedQuery])
 
     const onNotePress = (note: Note) => {
-        // TODO: Navigate to note detail
-        console.log('Note pressed:', note.title)
+        router.push(`/(main)/notes/note-detail?noteId=${note.id}`)
     }
 
     const onNoteDelete = async (noteId: string) => {
@@ -52,8 +51,7 @@ export default function NotesView({
     }
 
     const onNoteShare = (noteId: string) => {
-        // TODO: Share note
-        console.log('Note shared:', noteId)
+        router.push(`/(main)/notes/note-detail?=${noteId}`); // Remove the braces in params
     }
 
     const onNoteAddToCategory = (noteId: string, remove: boolean) => {
