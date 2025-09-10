@@ -34,6 +34,7 @@ interface NotesState {
     getNotesByFolder: (folderId?: string | null) => Note[];
     getFavoriteNotes: () => Note[];
     getFilteredNotes: (folderId?: string | null, favorite?: boolean) => Note[];
+    getNoteById: (noteId: string) => Note | undefined;
 
     // Utility
     refresh: () => Promise<void>;
@@ -409,6 +410,11 @@ export const useNotesStore = create<NotesState>()(
                 });
             },
 
+            getNoteById: (noteId: string) => {
+                const notes = get().notes;
+                return notes.find(note => note.id === noteId);
+            },
+
             // Refresh notes
             refresh: async () => {
                 await get().fetchNotes();
@@ -462,6 +468,7 @@ export const useNotesActions = () => {
         getNotesByFolder: state.getNotesByFolder,
         getFavoriteNotes: state.getFavoriteNotes,
         getFilteredNotes: state.getFilteredNotes,
+        getNoteById: state.getNoteById,
     }));
 
     return actions;
@@ -483,6 +490,7 @@ export const useNotesData = () => {
 export const getNotes = () => useNotesStore.getState().notes;
 export const getNotesLoading = () => useNotesStore.getState().loading;
 export const getNotesError = () => useNotesStore.getState().error;
+export const getNoteById = (noteId: string) => useNotesStore.getState().getNoteById(noteId);
 
 // Initialize the store when the module is imported
 // This ensures realtime is set up early
