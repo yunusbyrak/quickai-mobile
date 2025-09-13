@@ -44,7 +44,10 @@
         "ios": {
             "supportsTablet": true,
             "bundleIdentifier": "com.example.quick",
-            "usesAppleSignIn": true
+            "usesAppleSignIn": true,
+            "infoPlist": {
+                "ITSAppUsesNonExemptEncryption": false
+            }
         },
         "android": {
             "adaptiveIcon": {

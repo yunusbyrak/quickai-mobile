@@ -17,7 +17,7 @@ export default function YoutubeVideo({
     videoId,
 }: YoutubeVideoProps) {
     const [isReady, setIsReady] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
     const [meta, setMeta] = useState<YoutubeMeta | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -38,8 +38,8 @@ export default function YoutubeVideo({
                             flex: 1,
                             borderTopLeftRadius: 16,
                             borderTopRightRadius: 16,
-                            borderBottomLeftRadius: !isCollapsed ? 16 : 0,
-                            borderBottomRightRadius: !isCollapsed ? 16 : 0,
+                            borderBottomLeftRadius: isCollapsed ? 16 : 0,
+                            borderBottomRightRadius: isCollapsed ? 16 : 0,
                         }}
                     >
                         <HapticButton
@@ -64,7 +64,7 @@ export default function YoutubeVideo({
                                     accessibilityLabel="Play video"
                                     hitSlop={8}
                                 >
-                                    <Ionicons name={isCollapsed ? "chevron-up" : "chevron-down"} size={22} color="#fff" />
+                                    <Ionicons name={!isCollapsed ? "chevron-up" : "chevron-down"} size={22} color="#fff" />
                                 </View>
                             </View>
                         </HapticButton>
@@ -76,8 +76,8 @@ export default function YoutubeVideo({
                         style={{
                             borderTopLeftRadius: 16,
                             borderTopRightRadius: 16,
-                            borderBottomLeftRadius: !isCollapsed ? 16 : 0,
-                            borderBottomRightRadius: !isCollapsed ? 16 : 0,
+                            borderBottomLeftRadius: isCollapsed ? 16 : 0,
+                            borderBottomRightRadius: isCollapsed ? 16 : 0,
                         }}
                     >
                         <HapticButton
@@ -91,12 +91,14 @@ export default function YoutubeVideo({
 
                 <View className="relative">
                     {!isReady && (
-                        <View className={cn('absolute top-0 left-0 right-0 bottom-0 bg-black/90 items-center justify-center', !isCollapsed && 'hidden')}>
+                        <View className={cn('absolute top-0 left-0 right-0 bottom-0 bg-black/90 items-center justify-center', {
+                            'hidden': isCollapsed
+                        })}>
                             {/* <Image source={{uri: meta?.thumbnail_url}} className="w-full h-full" /> */}
                             <ActivityIndicator size="small" color="#fff" />
                         </View>
                     )}
-                    {isCollapsed && <YoutubePlayer
+                    {!isCollapsed && <YoutubePlayer
                         contentScale={0.7}
                         initialPlayerParams={{
                             controls: false,

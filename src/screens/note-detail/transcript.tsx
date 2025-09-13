@@ -253,7 +253,7 @@ export default function TranscriptScreen({
                 </HapticButton>
             </View>
             <View
-                className="flex-1 bg-white rounded-2xl shadow-sm border border-foreground/5 mx-4"
+                className="flex-1 bg-white rounded-2xl shadow-xs border border-foreground/5 mx-4"
             >
                 <View className="border-b border-gray-100 mx-4 pb-4 pt-4 ">
                     <Text className="text-gray-900 font-semibold">

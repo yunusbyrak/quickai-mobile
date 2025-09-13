@@ -66,13 +66,13 @@ export const NotesList = React.forwardRef<
     React.ElementRef<typeof View>,
     NotesListProps
 >(({ notes, onNotePress, onNoteDelete, onNoteFavorite, onNoteShare, onNoteAddToCategory, isGridView = false, className, emptyState, ...props }, ref) => {
-    if (notes.length === 0) {
-        return (
-            <View ref={ref} className={cn('flex-1', className)} {...props}>
-                {emptyState || <DefaultEmptyState />}
-            </View>
-        )
-    }
+    // if (notes.length === 0) {
+    //     return (
+    //         <View ref={ref} className={cn('flex-1', className)} {...props}>
+    //             {emptyState || <DefaultEmptyState />}
+    //         </View>
+    //     )
+    // }
 
     // TODO small screen should be 2 columns
     const gridColumns = 3;
@@ -141,6 +141,7 @@ export const NotesList = React.forwardRef<
         return (
             <View ref={ref} className={cn('flex-1', className)} {...props}>
                 <FlashList
+                    ListEmptyComponent={<DefaultEmptyState />}
                     data={gridData}
                     renderItem={renderGridRow}
                     keyExtractor={gridKeyExtractor}
@@ -155,6 +156,7 @@ export const NotesList = React.forwardRef<
     return (
         <View ref={ref} className={cn('flex-1', className)} {...props}>
             <FlashList
+                ListEmptyComponent={<DefaultEmptyState />}
                 data={notes}
                 renderItem={renderListItem}
                 keyExtractor={listKeyExtractor}

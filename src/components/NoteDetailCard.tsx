@@ -2,16 +2,11 @@ import { useState } from 'react';
 import { View, Pressable, Animated, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from './ui/text';
-import { cn } from '@/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export interface NoteDetailCardProps {
     title: string;
-    subtitle?: string;
     children: React.ReactNode;
-    className?: string;
-    headerClassName?: string;
-    contentClassName?: string;
     defaultCollapsed?: boolean;
     footer?: React.ReactNode;
     onToggle?: (isCollapsed: boolean) => void;
@@ -25,11 +20,7 @@ export interface NoteDetailCardProps {
 
 export default function NoteDetailCard({
     title,
-    subtitle,
     children,
-    className,
-    headerClassName,
-    contentClassName,
     defaultCollapsed = false,
     footer,
     onToggle,
@@ -61,27 +52,17 @@ export default function NoteDetailCard({
     });
 
     return (
-        <View className={cn('bg-white rounded-2xl shadow-sm shadow-black/5 border border-foreground/5', className)}>
+        <View className="bg-white rounded-2xl shadow-sm shadow-black/5 border border-foreground/5">
             {/* Header */}
             <Pressable
                 onPress={toggleCollapsed}
-                className={cn(
-                    'px-4 py-3 ',
-                    headerClassName
-                )}
+                className="px-4 py-3"
             >
-                <View className={cn("flex-row items-center justify-between", {
-                    'border-b border-gray-100 pb-3': !isCollapsed,
-                })}>
+                <View className={`flex-row items-center justify-between ${!isCollapsed ? 'border-b border-gray-100 pb-3' : ''}`}>
                     <View className="flex-1">
                         <Text variant="h4" className="text-gray-900 text-base">
                             {title}
                         </Text>
-                        {subtitle && (
-                            <Text variant="small" className="text-gray-600 mt-1">
-                                {subtitle}
-                            </Text>
-                        )}
                     </View>
 
                     <View className="flex-row items-center space-x-2">
@@ -106,7 +87,7 @@ export default function NoteDetailCard({
                     style={{
                         opacity: animation,
                     }}
-                    className={cn('overflow-hidden', contentClassName)}
+                    className="overflow-hidden"
                 >
                     <ScrollView
                         className="max-h-[300px]"
