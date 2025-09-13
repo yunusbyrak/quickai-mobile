@@ -596,6 +596,7 @@ export type Database = {
           updated_at: string | null
           url: string | null
           user_id: string | null
+          segments: Json | null
         }
         Insert: {
           available_langs?: Json | null

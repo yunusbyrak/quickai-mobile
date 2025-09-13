@@ -137,9 +137,7 @@ export function AnimatedTabs({
             damping: animationConfig.damping,
             stiffness: animationConfig.stiffness,
             mass: 1,
-            overshootClamping: true,
-            restDisplacementThreshold: 0.01,
-            restSpeedThreshold: 0.01,
+            overshootClamping: true
         });
     }, [contentWidth, animationConfig]);
 
