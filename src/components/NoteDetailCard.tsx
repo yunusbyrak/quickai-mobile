@@ -3,6 +3,7 @@ import { View, Pressable, Animated, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from './ui/text';
 import { LinearGradient } from 'expo-linear-gradient';
+import { cn } from '@/lib/utils';
 
 export interface NoteDetailCardProps {
     title: string;
@@ -56,7 +57,9 @@ export default function NoteDetailCard({
             {/* Header */}
             <Pressable
                 onPress={toggleCollapsed}
-                className="px-4 py-3"
+                className={cn('px-4 pt-3 relative', {
+                    'pb-3': isCollapsed,
+                })}
             >
                 <View className={`flex-row items-center justify-between ${!isCollapsed ? 'border-b border-gray-100 pb-3' : ''}`}>
                     <View className="flex-1">
@@ -87,8 +90,20 @@ export default function NoteDetailCard({
                     style={{
                         opacity: animation,
                     }}
-                    className="overflow-hidden"
+                    className="overflow-hidden relative"
                 >
+                    <LinearGradient
+                        colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0)']}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: 24,
+                            zIndex: 30,
+                        }}
+                        pointerEvents="none"
+                    />
                     <ScrollView
                         className="max-h-[300px]"
                         showsVerticalScrollIndicator={false}

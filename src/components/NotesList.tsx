@@ -1,4 +1,4 @@
-import { View } from 'react-native'
+import { RefreshControl, View } from 'react-native'
 import React, { useCallback, useMemo } from 'react'
 import { FlashList } from '@shopify/flash-list'
 import { NoteItem } from './NoteItem'
@@ -16,6 +16,9 @@ export interface NotesListProps {
     isGridView?: boolean
     className?: string
     emptyState?: React.ReactNode
+    // Add refresh props
+    onRefresh?: () => Promise<void> | void
+    refreshing?: boolean
 }
 
 const DefaultEmptyState = () => (
@@ -65,7 +68,20 @@ const createGridData = (notes: Note[], gridColumns: number): GridRowData[] => {
 export const NotesList = React.forwardRef<
     React.ElementRef<typeof View>,
     NotesListProps
->(({ notes, onNotePress, onNoteDelete, onNoteFavorite, onNoteShare, onNoteAddToCategory, isGridView = false, className, emptyState, ...props }, ref) => {
+>(({
+    notes,
+    onNotePress,
+    onNoteDelete,
+    onNoteFavorite,
+    onNoteShare,
+    onNoteAddToCategory,
+    isGridView = false,
+    className,
+    emptyState,
+    onRefresh,
+    refreshing = false,
+    ...props
+}, ref) => {
     // if (notes.length === 0) {
     //     return (
     //         <View ref={ref} className={cn('flex-1', className)} {...props}>
@@ -137,6 +153,23 @@ export const NotesList = React.forwardRef<
     const gridKeyExtractor = useCallback((item: GridRowData) => `row-${item.rowIndex}`, [])
     const listKeyExtractor = useCallback((item: Note) => item.id, [])
 
+    // Handle refresh
+    const handleRefresh = useCallback(async () => {
+        if (onRefresh) {
+            await onRefresh()
+        }
+    }, [onRefresh])
+
+    // Create refresh control
+    const refreshControl = useMemo(() => (
+        <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor="#333" // iOS spinner color
+            colors={['#333']} // Android spinner color
+        />
+    ), [refreshing, handleRefresh])
+
     if (isGridView) {
         return (
             <View ref={ref} className={cn('flex-1', className)} {...props}>
@@ -148,6 +181,7 @@ export const NotesList = React.forwardRef<
                     estimatedItemSize={130} // Estimated height for grid rows with spacing
                     showsVerticalScrollIndicator={false}
                     removeClippedSubviews={true}
+                    refreshControl={refreshControl}
                 />
             </View>
         )
@@ -163,6 +197,7 @@ export const NotesList = React.forwardRef<
                 estimatedItemSize={90} // Estimated height for list items with spacing
                 showsVerticalScrollIndicator={false}
                 removeClippedSubviews={true}
+                refreshControl={refreshControl}
             />
         </View>
     )

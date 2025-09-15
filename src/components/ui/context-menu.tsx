@@ -1,62 +1,3 @@
-/**
- * ContextMenu Component
- *
- * A reusable context menu component built on top of react-native-context-menu-view.
- * Provides a better API with proper TypeScript support and action-based event handling.
- *
- * @example
- * ```tsx
- * const actions: ContextMenuAction[] = [
- *   {
- *     id: 'edit',
- *     title: 'Edit',
- *     systemIcon: 'pencil',
- *   },
- *   {
- *     id: 'share',
- *     title: 'Share',
- *     systemIcon: 'square.and.arrow.up',
- *   },
- *   {
- *     id: 'color-options',
- *     title: 'Change Color',
- *     systemIcon: 'paintbrush',
- *     inlineChildren: true,
- *     actions: [
- *       { id: 'color-blue', title: 'Blue', systemIcon: 'paintbrush' },
- *       { id: 'color-red', title: 'Red', systemIcon: 'paintbrush' },
- *     ],
- *   },
- *   {
- *     id: 'delete',
- *     title: 'Delete',
- *     systemIcon: 'trash',
- *     destructive: true,
- *   },
- * ];
- *
- * <ContextMenu
- *   title="Options"
- *   actions={actions}
- *   onActionPress={(actionId, action) => {
- *     switch (actionId) {
- *       case 'edit':
- *         // Handle edit
- *         break;
- *       case 'delete':
- *         // Handle delete
- *         break;
- *       // Handle other actions...
- *     }
- *   }}
- * >
- *   <View className="bg-blue-500 p-4 rounded">
- *     <Text className="text-white">Long press me</Text>
- *   </View>
- * </ContextMenu>
- * ```
- */
-
 import React from 'react';
 import { Platform, processColor, StyleProp, ViewStyle } from 'react-native';
 import ContextMenu from 'react-native-context-menu-view';
@@ -83,6 +24,8 @@ export interface ContextMenuAction {
     destructive?: boolean;
     /** Whether the action is disabled */
     disabled?: boolean;
+
+    titleColor?: string;
     /** Whether to show nested actions inline */
     inlineChildren?: boolean;
     /** Nested actions for submenu */
@@ -139,6 +82,10 @@ function ContextMenuComponent({
             transformedAction.systemIcon = action.systemIcon;
         }
 
+        if (action.titleColor) {
+            transformedAction.titleColor = action.titleColor;
+        }
+
         // Handle custom icons with platform-specific properties
         if (action.customIcon) {
             if (Platform.OS === 'ios') {
@@ -171,6 +118,7 @@ function ContextMenuComponent({
         if (action.actions && action.actions.length > 0) {
             transformedAction.actions = action.actions.map((nestedAction) => ({
                 title: nestedAction.title,
+                titleColor: nestedAction.titleColor,
                 systemIcon: nestedAction.systemIcon,
                 customIcon: nestedAction.customIcon,
                 customIconColor: nestedAction.customIconColor

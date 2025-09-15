@@ -195,7 +195,7 @@ function FolderSelectItem({ folder, isSelected, onToggle, variant = 'list' }: Fo
             className={cn("flex-row items-center py-3 px-1 pr-4", !isSelected && "opacity-50")}
             activeOpacity={0.7}
         >
-            <View className="flex-row items-center shadow shadow-black rounded-lg">
+            <View className="flex-row items-center rounded-lg">
                 {/* Folder Icon */}
                 <View className="w-12 h-12 items-center justify-center mr-3">
                     <Image

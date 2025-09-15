@@ -280,6 +280,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
                     data: { session: currentSession },
                     error,
                 } = await supabase.auth.getSession();
+                console.log('🔍 Supabase session:', currentSession);
 
                 if (!currentSession) {
                     // sign in with anonymous

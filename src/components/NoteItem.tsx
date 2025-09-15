@@ -152,16 +152,19 @@ export const NoteItem = React.forwardRef<
             id: note.favorite ? 'remove-from-favorites' : 'add-to-favorites',
             title: note.favorite ? 'Remove from Favorites' : 'Add to Favorites',
             systemIcon: note.favorite ? 'heart.fill' : 'heart',
+            titleColor: '#333',
         },
         {
             id: note.folder_id ? 'remove-from-folder' : 'add-to-folder',
             title: note.folder_id ? 'Remove from Folder' : 'Add to Folder',
             systemIcon: note.folder_id ? 'folder.fill' : 'folder',
+            titleColor: '#333',
         },
         {
             id: 'share',
             title: 'Share',
             systemIcon: 'square.and.arrow.up',
+            titleColor: '#333',
         },
         {
             id: 'delete',

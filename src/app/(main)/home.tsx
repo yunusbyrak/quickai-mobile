@@ -63,7 +63,7 @@ export default function Home() {
                 <View className="flex-row items-center gap-2">
                     <Image source={require('~/assets/images/logo-3d.png')} className="w-10 h-10" />
                     <Text variant="h3" className="font-bold text-foreground font-poppins-bold">
-                        Quick
+                        Quick AI
                     </Text>
                 </View>
                 <HapticButton
@@ -126,14 +126,13 @@ export default function Home() {
 
             {/* Bottom Navigation */}
             <View className="flex-row items-center justify-center px-4 pt-4 bg-transparent absolute bottom-10 right-0 left-0">
-                <View className="flex-row rounded-full p-1 gap-4 border border-border bg-background">
-                    <TouchableOpacity
-                        className="h-12 bg-orange-500 rounded-full items-center justify-center flex-row px-6 gap-2"
-                        onPress={() => router.push('/(main)/audio-recording')}
+                <View className="flex-row rounded-full gap-4 border border-border bg-background">
+                    <HapticButton
+                        className="h-12 bg-foreground rounded-full items-center justify-center flex-row px-6 gap-2"
                     >
                         <MaterialIcons name="add" size={24} color="white" />
                         <Text className="font-medium text-background">New Note</Text>
-                    </TouchableOpacity>
+                    </HapticButton>
                 </View>
             </View>
         </View>

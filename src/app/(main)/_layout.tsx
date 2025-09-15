@@ -6,16 +6,22 @@ export default function Layout() {
         <View className="flex-1 bg-background">
             <Stack
                 screenOptions={{
+                    headerBackButtonDisplayMode: 'minimal',
                     headerShown: false,
                 }}
             >
                 <Stack.Screen name="home" />
+
+                <Stack.Screen name="notes/detail/[noteId]" />
+                <Stack.Screen name="notes/detail/summary/[slug]" />
+
                 <Stack.Screen
                     name="settings"
                     options={{
                         presentation: 'modal',
                     }}
                 />
+
                 <Stack.Screen
                     name="folders/folder-create"
                     options={{

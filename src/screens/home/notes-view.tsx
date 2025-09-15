@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { HapticButton, NotesList, SearchBar } from '@/components'
 import { useNotes } from '@/hooks/useNotes'
 import type { Note } from '@/types/note'
@@ -21,6 +21,7 @@ export default function NotesView({
 }: NotesViewProps) {
     const router = useRouter()
     const [isGridView, setIsGridView] = useState(false)
+    const [refreshing, setRefreshing] = useState(false)
     const { notes, loading, error, refresh, deleteNote, updateNoteFavorite, updateNoteFolder } = useNotes({
         folderId,
         favorite
@@ -39,7 +40,7 @@ export default function NotesView({
     }, [notes, debouncedQuery])
 
     const onNotePress = (note: Note) => {
-        router.push(`/(main)/notes/note-detail?noteId=${note.id}`)
+        router.push(`/(main)/notes/detail/${note.id}`)
     }
 
     const onNoteDelete = async (noteId: string) => {
@@ -51,7 +52,7 @@ export default function NotesView({
     }
 
     const onNoteShare = (noteId: string) => {
-        router.push(`/(main)/notes/note-detail?=${noteId}`); // Remove the braces in params
+        router.push(`/(main)/notes/detail/${noteId}`); // Remove the braces in params
     }
 
     const onNoteAddToCategory = (noteId: string, remove: boolean) => {
@@ -61,6 +62,16 @@ export default function NotesView({
             router.push(`/(main)/notes/note-add-folder?noteId=${noteId}`);
         }
     }
+
+    // Handle pull-to-refresh
+    const handleRefresh = useCallback(async () => {
+        setRefreshing(true)
+        try {
+            await refresh()
+        } finally {
+            setRefreshing(false)
+        }
+    }, [refresh])
 
     return (
         <>
@@ -90,7 +101,7 @@ export default function NotesView({
             </View>
 
             {/* Content */}
-            <ScrollView className="flex-1 px-4">
+            <View className="flex-1 px-4">
                 <NotesList
                     notes={filteredNotes}
                     isGridView={isGridView}
@@ -99,6 +110,8 @@ export default function NotesView({
                     onNoteFavorite={onNoteFavorite}
                     onNoteShare={onNoteShare}
                     onNoteAddToCategory={onNoteAddToCategory}
+                    onRefresh={handleRefresh}
+                    refreshing={refreshing}
                     emptyState={
                         debouncedQuery.trim() ? (
                             <View className="flex-1 items-center justify-center py-8">
@@ -112,7 +125,7 @@ export default function NotesView({
                         ) : undefined
                     }
                 />
-            </ScrollView>
+            </View>
         </>
     )
 }

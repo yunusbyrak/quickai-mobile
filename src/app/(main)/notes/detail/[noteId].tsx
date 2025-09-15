@@ -1,15 +1,16 @@
 import { HapticButton, NoteCard, NoteDetailCard } from "@/components";
 import { Text } from "@/components/ui/text";
 import { useNotes } from "@/hooks/useNotes";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Image, View, Alert, ScrollView, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { ContextMenu, type ContextMenuAction } from '@/components/ui/context-menu';
 import { useState } from "react";
-import Markdown from 'react-native-markdown-display';
+import Markdown from '@/components/Markdown';
 import YoutubeDetailScreen from "@/screens/note-detail/youtube-detail";
+import { dateFormat } from "@/utils/functions";
 
 export default function NoteDetail() {
     const insets = useSafeAreaInsets();
@@ -94,92 +95,91 @@ export default function NoteDetail() {
     };
 
     return (
-        <View
-            className='flex-1 bg-muted gap-2'
-            style={{
-                paddingTop: Math.max(insets.top, 16),
-                paddingBottom: Math.max(insets.bottom, 16),
-            }}
-        >
-            {/* Header Gradient Image */}
-            <View className="absolute top-0 left-0 right-0 items-center">
-                <Image
-                    source={require('~/assets/images/header-gradient.png')}
-                    className="w-full"
-                    resizeMode="cover"
-                />
-            </View>
+        <>
+            <View
+                className='flex-1 bg-muted gap-2'
+                style={{
+                    paddingTop: Math.max(insets.top, 16),
+                    paddingBottom: Math.max(insets.bottom, 16),
+                }}
+            >
+                {/* Header Gradient Image */}
+                <View className="absolute top-0 left-0 right-0 items-center">
+                    <Image
+                        source={require('~/assets/images/header-gradient.png')}
+                        className="w-full"
+                        resizeMode="cover"
+                    />
+                </View>
 
-            {/* Header */}
-            <View className="flex-row items-center justify-between px-4 gap-3">
-                {/* Back button */}
-                <HapticButton
-                    onPress={() => router.back()}
-                    className="rounded-full items-center justify-center"
-                >
-                    <Ionicons name="chevron-back-outline" size={26} color={isDark ? 'white' : 'black'} />
-                </HapticButton>
-
-                {/* Actions menu */}
-                <View className="flex-row items-center gap-4">
-
-                    {/* Share button */}
+                {/* Header */}
+                <View className="flex-row items-center justify-between px-4 gap-3">
+                    {/* Back button */}
                     <HapticButton
-                        hapticType="medium"
+                        onPress={() => router.back()}
                         className="rounded-full items-center justify-center"
-                        accessibilityRole="button"
-                        accessibilityLabel="Note options"
                     >
-                        <Ionicons name="share-outline" size={26} color={isDark ? 'white' : 'black'} />
+                        <Ionicons name="chevron-back-outline" size={26} color={isDark ? 'white' : 'black'} />
                     </HapticButton>
 
-                    <ContextMenu
-                        dropdownMenuMode
-                        previewBackgroundColor='transparent'
-                        actions={actions}
-                        onActionPress={onContextMenuActionPress}
-                    >
+                    {/* Actions menu */}
+                    <View className="flex-row items-center gap-4">
+
+                        {/* Share button */}
                         <HapticButton
                             hapticType="medium"
                             className="rounded-full items-center justify-center"
                             accessibilityRole="button"
                             accessibilityLabel="Note options"
                         >
-                            <Ionicons name="ellipsis-horizontal-circle" size={26} color={isDark ? 'white' : 'black'} />
+                            <Ionicons name="share-outline" size={26} color={isDark ? 'white' : 'black'} />
                         </HapticButton>
-                    </ContextMenu>
-                </View>
-            </View>
 
-            {/* Centered title */}
-            <View className="px-4 pt-2">
-                <Text
-                    variant="h3"
-                    className="text-foreground font-medium"
-                >
-                    {note.title || 'Untitled Note'}
-                </Text>
-            </View>
-
-            {/* Content Area */}
-            <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
-
-                {note.type === 'youtube' && <YoutubeDetailScreen note={note} />}
-                {/* Summary Card */}
-                <NoteDetailCard
-                    title="Summary"
-                    defaultCollapsed={false}
-                >
-                    <View className="px-4 pb-4">
-                        <Markdown>{note.summary}</Markdown>
-                        {/* <Text className="text-sm font-light">
-                            {note.summary}
-                        </Text> */}
+                        <ContextMenu
+                            dropdownMenuMode
+                            previewBackgroundColor='transparent'
+                            actions={actions}
+                            onActionPress={onContextMenuActionPress}
+                        >
+                            <HapticButton
+                                hapticType="medium"
+                                className="rounded-full items-center justify-center"
+                                accessibilityRole="button"
+                                accessibilityLabel="Note options"
+                            >
+                                <Ionicons name="ellipsis-horizontal-circle" size={26} color={isDark ? 'white' : 'black'} />
+                            </HapticButton>
+                        </ContextMenu>
                     </View>
-                </NoteDetailCard>
+                </View>
 
-            </ScrollView>
+                {/* Centered title */}
+                <View className="px-4 pt-2">
+                    <Text
+                        variant="h3"
+                        className="text-foreground font-medium"
+                    >
+                        {note.title || 'Untitled Note'}
+                    </Text>
+                </View>
 
-        </View>
+                {/* Content Area */}
+                <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+
+                    {note.type === 'youtube' && <YoutubeDetailScreen note={note} />}
+                    <NoteDetailCard
+                        title="Summary"
+                        defaultCollapsed={false}
+                        onViewMore={() => router.push(`/(main)/notes/detail/summary/test`)}
+                    >
+                        <View className="px-4 pb-4">
+                            <Markdown>{note.summary}</Markdown>
+                        </View>
+                    </NoteDetailCard>
+                </ScrollView>
+
+                <Text className="text-xs text-center text-foreground/50">{dateFormat(note.created_at || '', 'short')}</Text>
+            </View>
+        </>
     )
 }
