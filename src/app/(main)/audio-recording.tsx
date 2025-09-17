@@ -18,7 +18,6 @@ import {
     AudioBufferSourceNode,
     AudioBuffer,
 } from 'react-native-audio-api';
-import AudioVisualizer from '@/components/AudioVisualizer/AudioVisualizer';
 
 
 const SAMPLE_RATE = 44100;
