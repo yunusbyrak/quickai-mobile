@@ -10,10 +10,20 @@ export default function Layout() {
                     headerShown: false,
                 }}
             >
-                <Stack.Screen name="home" />
+                <Stack.Screen
+                    name="home"
+                />
+                <Stack.Screen name="audio-recording" />
 
-                <Stack.Screen name="notes/detail/[noteId]" />
-                <Stack.Screen name="notes/detail/summary/[slug]" />
+                {/* Notes */}
+                <Stack.Screen name="notes/detail" options={{ headerShown: true }} />
+                <Stack.Screen name="notes/summary" options={{ headerShown: true }} />
+                <Stack.Screen
+                    name="notes/note-add-folder"
+                    options={{
+                        presentation: 'modal',
+                    }}
+                />
 
                 <Stack.Screen
                     name="settings"
@@ -30,12 +40,6 @@ export default function Layout() {
                 />
                 <Stack.Screen
                     name="folders/folder-edit"
-                    options={{
-                        presentation: 'modal',
-                    }}
-                />
-                <Stack.Screen
-                    name="notes/note-add-folder"
                     options={{
                         presentation: 'modal',
                     }}

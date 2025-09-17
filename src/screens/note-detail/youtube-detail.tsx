@@ -2,6 +2,7 @@
 import { HapticButton } from "@/components/ui/haptic-button";
 import { Text } from "@/components/ui/text";
 import { Note } from "@/types/note";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, View } from "react-native";
 import { getYoutubeMeta } from "react-native-youtube-iframe";
@@ -14,6 +15,7 @@ interface NoteDetailYoutubeProps {
 export default function YoutubeDetailScreen({
     note
 }: NoteDetailYoutubeProps) {
+    const router = useRouter();
     const videoId = 'RcYjXbSJBN8';
 
     const [meta, setMeta] = useState<YoutubeMeta | null>(null);
@@ -40,6 +42,7 @@ export default function YoutubeDetailScreen({
                         <HapticButton
                             hapticType="medium"
                             className="items-start"
+                            onPress={() => router.push(`/(main)/notes/detail?noteId=${note.id}`)}
                         >
                             <View className="bg-muted-foreground/10 rounded-full p-1 px-2">
                                 <Text className="text-xs">View Transcript</Text>

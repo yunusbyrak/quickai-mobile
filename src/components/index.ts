@@ -6,15 +6,6 @@ export { NotesList, type NotesListProps } from './NotesList';
 export { FolderItem, type FolderItemProps } from './FolderItem';
 export { FolderList, type FolderListProps } from './FolderList';
 
-// Audio Components
-export { AudioWave } from './audio/AudioWave';
-export { RecordingControls } from './audio/RecordingControls';
-export { RecordingStatus } from './audio/RecordingStatus';
-export { RecordingTimer } from './audio/RecordingTimer';
-export { AudioPlayer } from './audio/AudioPlayer';
-export { ProcessingStatus, type ProcessingStep } from './audio/ProcessingStatus';
-export { PreviewContent } from './audio/PreviewContent';
-
 // UI Components
 export { SvgIcon } from './ui/svg-icon';
 export { HapticButton, type HapticButtonProps } from './ui/haptic-button';

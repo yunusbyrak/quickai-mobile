@@ -11,6 +11,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { StatusBar, View } from 'react-native';
 import { AuthProvider } from '@/context/AuthContext';
 import { RevenueCatProvider } from '@/context/RevenuCatContext';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 
 export default function Layout() {
 
@@ -47,14 +48,16 @@ export default function Layout() {
         <RevenueCatProvider>
             <ThemeProvider>
                 <ThemedLayout>
-                    <AuthProvider>
-                        <Stack
-                            screenOptions={{
-                                headerShown: false,
-                            }}
-                        />
-                        <PortalHost />
-                    </AuthProvider>
+                    <BottomSheetModalProvider>
+                        <AuthProvider>
+                            <Stack
+                                screenOptions={{
+                                    headerShown: false,
+                                }}
+                            />
+                            <PortalHost />
+                        </AuthProvider>
+                    </BottomSheetModalProvider>
                 </ThemedLayout>
             </ThemeProvider>
         </RevenueCatProvider>

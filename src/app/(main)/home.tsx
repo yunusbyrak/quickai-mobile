@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import NotesView from '@/screens/home/notes-view'
 import FoldersView from '@/screens/home/folders-view'
+import NoteAddModal from '@/components/NoteAddModal'
 
 
 export default function Home() {
@@ -125,16 +126,7 @@ export default function Home() {
             </View>
 
             {/* Bottom Navigation */}
-            <View className="flex-row items-center justify-center px-4 pt-4 bg-transparent absolute bottom-10 right-0 left-0">
-                <View className="flex-row rounded-full gap-4 border border-border bg-background">
-                    <HapticButton
-                        className="h-12 bg-foreground rounded-full items-center justify-center flex-row px-6 gap-2"
-                    >
-                        <MaterialIcons name="add" size={24} color="white" />
-                        <Text className="font-medium text-background">New Note</Text>
-                    </HapticButton>
-                </View>
-            </View>
+            <NoteAddModal />
         </View>
     )
 }
