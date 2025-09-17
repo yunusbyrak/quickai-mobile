@@ -18,8 +18,6 @@ import {
     AudioBufferSourceNode,
     AudioBuffer,
 } from 'react-native-audio-api';
-import Modal from '@/components/ui/modal';
-import { Button } from '@/components/ui/button';
 import LoaderModal from '@/components/LoaderModal';
 import { createNote } from '@/services/notes.service';
 import { useProfile } from '@/hooks/useProfile';
