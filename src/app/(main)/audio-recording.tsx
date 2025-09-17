@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Pressable, Alert, Platform, AppState } from 'react-native';
+import { View, Pressable, Alert, Platform, AppState, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
@@ -18,13 +18,20 @@ import {
     AudioBufferSourceNode,
     AudioBuffer,
 } from 'react-native-audio-api';
-
+import Modal from '@/components/ui/modal';
+import { Button } from '@/components/ui/button';
+import LoaderModal from '@/components/LoaderModal';
+import { createNote } from '@/services/notes.service';
+import { useProfile } from '@/hooks/useProfile';
 
 const SAMPLE_RATE = 44100;
 
 export default function AudioRecording() {
     const { isDark } = useTheme();
+    const { profile } = useProfile();
     const insets = useSafeAreaInsets();
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     const recorderRef = useRef<AudioRecorder | null>(null);
     const aCtxRef = useRef<AudioContext | null>(null);
@@ -177,16 +184,19 @@ export default function AudioRecording() {
                 setDuration(0);
             }
 
-            // Clean up intervals first to prevent memory leaks
             cleanup();
 
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
-            // TODO: Handle the recorded audio file (save to database, etc.)
-            console.log('Recording saved (mock)');
+            // router.back();
+            setIsModalVisible(true);
 
-            // Navigate back or to a processing screen
-            router.back();
+            const note = await createNote(profile?.id || '', {
+                status: 'running',
+                type: 'audio',
+            });
+
+
         } catch (error) {
             console.error('Failed to stop recording:', error);
             Alert.alert('Error', 'Failed to save recording');
@@ -312,6 +322,11 @@ export default function AudioRecording() {
                     </View>
                 </View>
             </View>
+
+            <LoaderModal
+                isVisible={isModalVisible}
+                title="Uploading audio..."
+            />
         </>
     );
 }
