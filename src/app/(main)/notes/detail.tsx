@@ -94,6 +94,8 @@ export default function NoteDetail() {
         }
     };
 
+    // console.log(note);
+
     return (
         <>
             <Stack.Screen
@@ -163,6 +165,7 @@ export default function NoteDetail() {
                 < ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false} >
 
                     {note.type === 'youtube' && <YoutubeDetailScreen note={note} />}
+
                     <NoteDetailCard
                         title="Summary"
                         defaultCollapsed={false}

@@ -79,7 +79,7 @@ interface NoteOption {
     title: string;
     description: string;
     type: string;
-    iconType: 'svg' | 'material';
+    iconType: 'svg' | 'material' | 'ionic';
     iconName?: string;
     onPress: () => void;
 }
@@ -174,9 +174,9 @@ export default function NoteAddModal() {
             id: 'enter-text',
             title: 'Enter Text',
             description: 'Type or paste your text',
-            type: 'website',
-            iconType: 'material',
-            iconName: 'edit',
+            type: 'text',
+            iconType: 'ionic',
+            iconName: 'text-outline',
             onPress: handleEnterText
         },
         {
@@ -205,14 +205,14 @@ export default function NoteAddModal() {
             iconName: 'audiotrack',
             onPress: handleUploadAudio
         },
-        {
-            id: 'upload-url',
-            title: 'Upload via URL',
-            description: 'Website, recording, PDF, image file',
-            type: 'website',
-            iconType: 'svg',
-            onPress: handleUploadViaURL
-        }
+        // {
+        //     id: 'upload-url',
+        //     title: 'Upload via URL',
+        //     description: 'Website, recording, PDF, image file',
+        //     type: 'website',
+        //     iconType: 'svg',
+        //     onPress: handleUploadViaURL
+        // }
     ];
 
     // Helper function to render icon based on type
@@ -224,6 +224,8 @@ export default function NoteAddModal() {
             return renderNoteIcon(option.type, 20, color, null);
         } else if (option.iconType === 'material' && option.iconName) {
             return <MaterialIcons name={option.iconName as any} size={20} color={color} />;
+        } else if (option.iconType === 'ionic' && option.iconName) {
+            return <Ionicons name={option.iconName as any} size={20} color={color} />;
         }
 
         return renderNoteIcon(option.type, 20, color, null);
