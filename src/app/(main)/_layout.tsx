@@ -14,6 +14,7 @@ export default function Layout() {
                     name="home"
                 />
                 <Stack.Screen name="audio-recording" />
+                <Stack.Screen name="image-scan" />
 
                 {/* Notes */}
                 <Stack.Screen name="notes/detail" options={{ headerShown: true }} />

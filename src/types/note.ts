@@ -35,3 +35,48 @@ export interface NotesListProps {
   className?: string
   emptyState?: React.ReactNode
 }
+
+// Audio transcription types
+export interface AudioTranscriptionSegment {
+  id: number
+  seek: number
+  start: number
+  end: number
+  text: string
+  tokens: number[]
+  temperature: number
+  avg_logprob: number
+  compression_ratio: number
+  no_speech_prob: number
+}
+
+export interface AudioTranscriptionResponse {
+  text: string
+  language: string
+  duration: number
+  segments: AudioTranscriptionSegment[]
+}
+
+export interface AudioSummary {
+  id: string
+  note_id: string
+  user_id: string
+  link: string | null
+  transcript: string | null
+  segments: AudioTranscriptionSegment[] | null
+  status: 'running' | 'completed' | 'failed'
+  created_at: string
+  updated_at: string
+}
+
+export interface TranscribeAudioRequest {
+  audioFile?: File
+  audioUrl?: string
+}
+
+export interface TranscribeAudioResponse {
+  id: string
+  noteId: string
+  status: 'running' | 'completed' | 'failed'
+  message: string
+}

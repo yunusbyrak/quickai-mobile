@@ -111,6 +111,7 @@ export default function NoteAddModal() {
     const handleTakePicture = useCallback(() => {
         console.log("Take Picture pressed");
         bottomSheetModalRef.current?.dismiss();
+        router.push('/image-scan');
     }, []);
 
     const handleUploadPDF = useCallback(() => {

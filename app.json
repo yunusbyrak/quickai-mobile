@@ -1,93 +1,101 @@
 {
-  "expo": {
-    "name": "QuickAI",
-    "slug": "quickai",
-    "version": "1.3.4",
-    "scheme": "quickai",
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      [
-        "expo-router",
-        {
-          "root": "./src/app"
+    "expo": {
+        "name": "QuickAI",
+        "slug": "quickai",
+        "version": "1.3.4",
+        "scheme": "quickai",
+        "web": {
+            "bundler": "metro",
+            "output": "static",
+            "favicon": "./assets/favicon.png"
+        },
+        "plugins": [
+            [
+                "expo-router",
+                {
+                    "root": "./src/app"
+                }
+            ],
+            [
+                "expo-dev-launcher",
+                {
+                    "launchMode": "most-recent"
+                }
+            ],
+            "expo-web-browser",
+            "expo-localization",
+            "expo-apple-authentication",
+            [
+                "expo-audio",
+                {
+                    "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+                }
+            ],
+            [
+                "react-native-audio-api",
+                {
+                    "iosBackgroundMode": true,
+                    "iosMicrophonePermission": "This app requires access to the microphone to record audio.",
+                    "androidPermissions": [
+                        "android.permission.MODIFY_AUDIO_SETTINGS",
+                        "android.permission.FOREGROUND_SERVICE",
+                        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+                    ],
+                    "androidForegroundService": true,
+                    "androidFSTypes": [
+                        "mediaPlayback"
+                    ]
+                }
+            ],
+            "expo-font",
+            [
+                "expo-camera",
+                {
+                    "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+                    "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+                    "recordAudioAndroid": true
+                }
+            ]
+        ],
+        "experiments": {
+            "typedRoutes": true,
+            "tsconfigPaths": true
+        },
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "userInterfaceStyle": "automatic",
+        "splash": {
+            "image": "./assets/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.example.quick",
+            "usesAppleSignIn": true,
+            "infoPlist": {
+                "ITSAppUsesNonExemptEncryption": false,
+                "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio notes."
+            }
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive-icon.png",
+                "backgroundColor": "#ffffff"
+            },
+            "package": "com.example.quick",
+            "permissions": [
+                "android.permission.RECORD_AUDIO"
+            ]
+        },
+        "extra": {
+            "router": {},
+            "eas": {
+                "projectId": "1956815e-b969-423e-b8fe-f0e210a07bb8"
+            }
         }
-      ],
-      [
-        "expo-dev-launcher",
-        {
-          "launchMode": "most-recent"
-        }
-      ],
-      "expo-web-browser",
-      "expo-localization",
-      "expo-apple-authentication",
-      [
-        "expo-audio",
-        {
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
-        }
-      ],
-      [
-        "react-native-audio-api",
-        {
-          "iosBackgroundMode": true,
-          "iosMicrophonePermission": "This app requires access to the microphone to record audio.",
-          "androidPermissions": [
-            "android.permission.MODIFY_AUDIO_SETTINGS",
-            "android.permission.FOREGROUND_SERVICE",
-            "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
-          ],
-          "androidForegroundService": true,
-          "androidFSTypes": [
-            "mediaPlayback"
-          ]
-        }
-      ],
-      "expo-font"
-    ],
-    "experiments": {
-      "typedRoutes": true,
-      "tsconfigPaths": true
-    },
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.example.quick",
-      "usesAppleSignIn": true,
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio notes."
-      }
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.example.quick",
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "1956815e-b969-423e-b8fe-f0e210a07bb8"
-      }
     }
-  }
 }
