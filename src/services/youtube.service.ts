@@ -1,10 +1,12 @@
 import {
+  TranscribeImageRequest,
   TranscribePdfRequest,
   TranscribeTextRequest,
   TranscribeYoutubeRequest,
 } from '@/types/transcribe';
 import { sessionController } from './session-controller';
 import { supabase } from '@/lib/supabase';
+import { TranscribeAudioRequest } from '@/types/note';
 
 const youtubeTranscribe = async (videos: TranscribeYoutubeRequest) => {
   try {
@@ -66,6 +68,30 @@ const pdfTranscribe = async (pdf: TranscribePdfRequest) => {
   } catch (error) {
     console.error('Error transcribing pdf:', error);
     throw error instanceof Error ? error : new Error('Failed to transcribe pdf');
+  }
+};
+
+export const imageTranscribe = async (image: TranscribeImageRequest) => {
+  try {
+    const { session } = await sessionController();
+
+    const formData = new FormData();
+
+    if (image?.imageFiles) {
+      image.imageFiles.forEach((file) => {
+        formData.append('imageFiles', file);
+      });
+    }
+
+    await supabase.functions.invoke('transcribe-image', {
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+  } catch (error) {
+    console.error('Error transcribing image:', error);
+    throw error instanceof Error ? error : new Error('Failed to transcribe image');
   }
 };
 

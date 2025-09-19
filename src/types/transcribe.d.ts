@@ -15,3 +15,7 @@ export interface TranscribePdfRequest {
   pdfFile: File;
   pdfUrl?: string;
 }
+
+export interface TranscribeImageRequest {
+  imageFiles: File[];
+}
