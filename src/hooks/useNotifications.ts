@@ -143,83 +143,6 @@ export const useNotifications = () => {
         }
     };
 
-    // Send local test notification
-    const sendLocalTest = async () => {
-        if (!permissionStatus.granted) {
-            Alert.alert('Permission Required', 'Please enable notifications first');
-            return;
-        }
-
-        setTestLoading('local');
-        try {
-            await Notifications.scheduleNotificationAsync({
-                content: {
-                    title: 'Test Local Notification',
-                    body: 'This is a test notification from your device',
-                },
-                trigger: null,
-            });
-            Alert.alert('Success', 'Local notification sent!');
-        } catch (error) {
-            console.error('Error sending local test:', error);
-            Alert.alert('Error', 'Failed to send test notification');
-        } finally {
-            setTestLoading(null);
-        }
-    };
-
-    // Send remote test notification
-    const sendRemoteTest = async () => {
-        if (!permissionStatus.granted) {
-            Alert.alert('Permission Required', 'Please enable notifications first');
-            return;
-        }
-
-        if (!Device.isDevice) {
-            Alert.alert('Device Required', 'Push notifications require a physical device');
-            return;
-        }
-
-        if (!expoPushToken) {
-            Alert.alert('Token Missing', 'Push token not available');
-            return;
-        }
-
-        setTestLoading('remote');
-        try {
-            console.log('🚀 Calling send-notifications function...');
-            console.log('🎯 Current push token:', expoPushToken ? `${expoPushToken.substring(0, 30)}...` : 'NULL');
-            console.log('👤 User session:', session?.user?.id ? 'Present' : 'Missing');
-
-            const { data, error } = await supabase.functions.invoke('send-notifications', {
-                body: {
-                    title: 'Test Push Notification',
-                    body: 'This is a test notification from the server',
-                },
-            });
-
-            console.log('📤 Function response:', { data, error });
-
-            if (error) {
-                console.error('❌ Function error details:', {
-                    message: error.message,
-                    details: error.details,
-                    hint: error.hint,
-                    code: error.code,
-                });
-                Alert.alert('Function Error', `${error.message}\n\nDetails: ${error.details || 'No details'}`);
-                return;
-            }
-
-            console.log('✅ Function success:', data);
-            Alert.alert('Success', 'Push notification sent from server!');
-        } catch (error: any) {
-            console.error('❌ Catch error:', error);
-            Alert.alert('Error', `Failed to send push notification: ${error.message || error}`);
-        } finally {
-            setTestLoading(null);
-        }
-    };
 
     // Settings object for compatibility with settings page
     const settings = {
@@ -448,8 +371,6 @@ export const useNotifications = () => {
         checkPermissions,
         checkSystemPermissions,
         requestPermissions,
-        sendLocalTest,
-        sendRemoteTest,
         testTokenFromSupabase,
         settings,
         updateSettings,

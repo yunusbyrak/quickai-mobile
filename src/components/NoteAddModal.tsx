@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, View, ActivityIndicator, TouchableOpacity, Alert } from "react-native";
 import BottomSheet, { BottomSheetModal, BottomSheetView, BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { Text } from "./ui/text";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { HapticButton } from "./ui/haptic-button";
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useRouter } from "expo-router";
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
+import LoaderModal from "./LoaderModal";
 
 
 
@@ -88,6 +89,8 @@ interface NoteOption {
 
 export default function NoteAddModal() {
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+    const [loadingTitle, setLoadingTitle] = useState('');
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
     // callbacks
@@ -119,6 +122,8 @@ export default function NoteAddModal() {
     const handleUploadPDF = useCallback(async () => {
         try {
             bottomSheetModalRef.current?.dismiss();
+            setIsLoading(true);
+            setLoadingTitle('Uploading PDF...');
 
             const result = await DocumentPicker.getDocumentAsync({
                 type: 'application/pdf',
@@ -134,10 +139,6 @@ export default function NoteAddModal() {
                     uri: file.uri,
                     mimeType: file.mimeType,
                 });
-
-                // TODO: Process the PDF file here
-                // You can add your PDF processing logic here
-                Alert.alert('PDF Selected', `Selected: ${file.name}`);
             }
         } catch (error) {
             console.error('Error picking PDF:', error);
@@ -307,6 +308,11 @@ export default function NoteAddModal() {
 
     return (
         <>
+            <LoaderModal
+                size="medium"
+                isVisible={isLoading}
+                title={loadingTitle}
+            />
             <View className="flex-row items-center justify-center px-4 pt-4 bg-transparent absolute bottom-10 right-0 left-0">
                 <HapticButton
                     onPress={handlePresentModalPress}

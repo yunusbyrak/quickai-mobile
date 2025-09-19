@@ -55,9 +55,9 @@ export default function Layout() {
                                     headerShown: false,
                                 }}
                             />
-                            <PortalHost />
                         </AuthProvider>
                     </BottomSheetModalProvider>
+                    <PortalHost />
                 </ThemedLayout>
             </ThemeProvider>
         </RevenueCatProvider>

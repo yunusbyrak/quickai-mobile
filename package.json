@@ -65,7 +65,6 @@
     "react-native-gesture-handler": "~2.24.0",
     "react-native-markdown-display": "^7.0.2",
     "react-native-mmkv": "^3.3.0",
-    "react-native-nitro-modules": "^0.29.2",
     "react-native-purchases": "^9.3.0",
     "react-native-purchases-ui": "^9.3.0",
     "react-native-reanimated": "^4.1.0",
