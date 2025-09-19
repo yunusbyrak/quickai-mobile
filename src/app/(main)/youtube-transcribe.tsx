@@ -21,7 +21,7 @@ import {
 import { getYoutubeMeta, YoutubeMeta } from 'react-native-youtube-iframe';
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated';
 import { TranscribeYoutubeRequest } from '@/types/transcribe';
-import { youtubeTranscribe } from '@/services/youtube.service';
+import { youtubeTranscribe } from '@/services/transcribe.service';
 
 interface YoutubeUrlInput {
   id: string;

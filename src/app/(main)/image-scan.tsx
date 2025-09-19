@@ -15,7 +15,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { cn } from '@/lib/utils';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { imageTranscribe } from '@/services/youtube.service';
+import { imageTranscribe } from '@/services/transcribe.service';
 import LoaderModal from '@/components/LoaderModal';
 
 export default function App() {

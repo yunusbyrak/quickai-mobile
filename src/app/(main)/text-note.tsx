@@ -16,7 +16,7 @@ import { Text } from '@/components/ui/text';
 import { Textarea } from '@/components/ui/textarea';
 import { useTheme } from '@/context/ThemeContext';
 import * as Clipboard from 'expo-clipboard';
-import { textTranscribe } from '@/services/youtube.service';
+import { textTranscribe } from '@/services/transcribe.service';
 
 // Constants
 const MAX_CHARACTERS = 100000;
