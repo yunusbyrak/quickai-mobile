@@ -19,3 +19,8 @@ export interface TranscribePdfRequest {
 export interface TranscribeImageRequest {
   imageFiles: File[];
 }
+
+export interface TranscribeUploadAudioRequest {
+  audioFile: File;
+  audioUrl?: string;
+}

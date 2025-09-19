@@ -2,6 +2,7 @@ import {
   TranscribeImageRequest,
   TranscribePdfRequest,
   TranscribeTextRequest,
+  TranscribeUploadAudioRequest,
   TranscribeYoutubeRequest,
 } from '@/types/transcribe';
 import { sessionController } from './session-controller';
@@ -95,4 +96,30 @@ export const imageTranscribe = async (image: TranscribeImageRequest) => {
   }
 };
 
-export { youtubeTranscribe, textTranscribe, pdfTranscribe };
+const uploadAudioTranscribe = async (audio: TranscribeUploadAudioRequest) => {
+  try {
+    const { session } = await sessionController();
+
+    const formData = new FormData();
+
+    if (audio.audioFile) {
+      formData.append('audioFile', audio.audioFile);
+    } else if (audio.audioUrl) {
+      formData.append('audioUrl', audio.audioUrl);
+    } else {
+      throw new Error('Either audioFile or audioUrl must be provided');
+    }
+
+    await supabase.functions.invoke('transcribe-audio', {
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+  } catch (error) {
+    console.error('Error uploading audio:', error);
+    throw error instanceof Error ? error : new Error('Failed to upload audio');
+  }
+};
+
+export { youtubeTranscribe, textTranscribe, pdfTranscribe, uploadAudioTranscribe };

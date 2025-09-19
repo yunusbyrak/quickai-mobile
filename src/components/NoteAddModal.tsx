@@ -25,7 +25,8 @@ import { useRouter } from 'expo-router';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import LoaderModal from './LoaderModal';
-import { pdfTranscribe } from '@/services/youtube.service';
+import { pdfTranscribe, uploadAudioTranscribe } from '@/services/youtube.service';
+import { transcribeAudio } from '@/services/audio.service';
 
 const getIconForNoteType = (type: string | null) => {
   switch (type) {
@@ -225,9 +226,31 @@ export default function NoteAddModal() {
     }
   }, []);
 
-  const handleUploadAudio = useCallback(() => {
-    console.log('Upload Audio pressed');
-    bottomSheetModalRef.current?.dismiss();
+  const handleUploadAudio = useCallback(async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: 'audio/*',
+        copyToCacheDirectory: true,
+        multiple: false,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const file = result.assets[0];
+
+        bottomSheetModalRef.current?.dismiss();
+
+        await uploadAudioTranscribe({
+          audioFile: {
+            uri: file.uri,
+            type: file.mimeType || 'audio/*',
+            name: file.name,
+          } as any,
+        });
+      }
+    } catch (error) {
+      console.error('Error picking audio:', error);
+      Alert.alert('Error', 'Failed to pick audio from device');
+    }
   }, []);
 
   const handleUploadViaURL = useCallback(() => {
