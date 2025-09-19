@@ -6,3 +6,7 @@ export interface YoutubeUrls {
 export interface TranscribeYoutubeRequest {
   urls: YoutubeUrls[];
 }
+
+export interface TranscribeTextRequest {
+  text: string;
+}
