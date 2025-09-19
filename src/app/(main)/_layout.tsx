@@ -15,6 +15,12 @@ export default function Layout() {
                 />
                 <Stack.Screen name="audio-recording" />
                 <Stack.Screen name="image-scan" />
+                <Stack.Screen name="text-note"
+                    options={{
+                        headerShown: true,
+                        presentation: 'pageSheet',
+                    }}
+                />
 
                 {/* Notes */}
                 <Stack.Screen name="notes/detail" options={{ headerShown: true }} />

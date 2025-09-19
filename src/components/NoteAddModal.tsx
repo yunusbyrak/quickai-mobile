@@ -120,8 +120,8 @@ export default function NoteAddModal() {
     }, []);
 
     const handleEnterText = useCallback(() => {
-        console.log("Enter Text pressed");
         bottomSheetModalRef.current?.dismiss();
+        router.push('/text-note');
     }, []);
 
     const handleYouTubeVideo = useCallback(() => {
