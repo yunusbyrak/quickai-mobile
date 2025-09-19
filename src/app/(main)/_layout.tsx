@@ -21,6 +21,12 @@ export default function Layout() {
                         presentation: 'pageSheet',
                     }}
                 />
+                <Stack.Screen name="youtube-transcribe"
+                    options={{
+                        headerShown: true,
+                        presentation: 'pageSheet',
+                    }}
+                />
 
                 {/* Notes */}
                 <Stack.Screen name="notes/detail" options={{ headerShown: true }} />

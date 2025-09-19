@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, TextInput, View, Clipboard } from "react-native";
+import { Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, TextInput, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { Textarea } from "@/components/ui/textarea";
 import { useTheme } from "@/context/ThemeContext";
+import * as Clipboard from 'expo-clipboard';
+
 
 // Constants
 const MAX_CHARACTERS = 100000;
@@ -15,9 +17,9 @@ const FOCUS_DELAY = 100;
 
 // Types
 interface TextNoteState {
-  text: string;
-  isLoading: boolean;
-  error: string | null;
+    text: string;
+    isLoading: boolean;
+    error: string | null;
 }
 
 export default function TextNote() {
@@ -49,7 +51,7 @@ export default function TextNote() {
 
     const handlePaste = useCallback(async () => {
         try {
-            const clipboardContent = await Clipboard.getString();
+            const clipboardContent = await Clipboard.getStringAsync();
             if (clipboardContent) {
                 setState(prev => ({
                     ...prev,

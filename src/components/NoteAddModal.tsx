@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View, ActivityIndicator, TouchableOpacity } from "react-native";
+import { ScrollView, StyleSheet, View, ActivityIndicator, TouchableOpacity, Alert } from "react-native";
 import BottomSheet, { BottomSheetModal, BottomSheetView, BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { Text } from "./ui/text";
 import { useCallback, useMemo, useRef } from "react";
@@ -10,6 +10,8 @@ import { SvgIcon } from "./ui/svg-icon";
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import { useRouter } from "expo-router";
+import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
 
 
 
@@ -114,9 +116,33 @@ export default function NoteAddModal() {
         router.push('/image-scan');
     }, []);
 
-    const handleUploadPDF = useCallback(() => {
-        console.log("Upload PDF pressed");
-        bottomSheetModalRef.current?.dismiss();
+    const handleUploadPDF = useCallback(async () => {
+        try {
+            bottomSheetModalRef.current?.dismiss();
+
+            const result = await DocumentPicker.getDocumentAsync({
+                type: 'application/pdf',
+                copyToCacheDirectory: true,
+                multiple: false,
+            });
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                const file = result.assets[0];
+                console.log('Selected PDF:', {
+                    name: file.name,
+                    size: file.size,
+                    uri: file.uri,
+                    mimeType: file.mimeType,
+                });
+
+                // TODO: Process the PDF file here
+                // You can add your PDF processing logic here
+                Alert.alert('PDF Selected', `Selected: ${file.name}`);
+            }
+        } catch (error) {
+            console.error('Error picking PDF:', error);
+            Alert.alert('Error', 'Failed to pick PDF document');
+        }
     }, []);
 
     const handleEnterText = useCallback(() => {
@@ -127,11 +153,47 @@ export default function NoteAddModal() {
     const handleYouTubeVideo = useCallback(() => {
         console.log("YouTube Video pressed");
         bottomSheetModalRef.current?.dismiss();
+        router.push('/youtube-transcribe');
     }, []);
 
-    const handleUploadImage = useCallback(() => {
-        console.log("Upload Image pressed");
-        bottomSheetModalRef.current?.dismiss();
+    const handleUploadImage = useCallback(async () => {
+        try {
+            bottomSheetModalRef.current?.dismiss();
+
+            // Request permission to access media library
+            const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+            if (permissionResult.granted === false) {
+                Alert.alert('Permission Required', 'Permission to access camera roll is required!');
+                return;
+            }
+
+            // Launch image picker
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: false,
+                quality: 0.8,
+                allowsMultipleSelection: true,
+            });
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                const images = result.assets;
+                console.log('Selected Images:', images.map(image => ({
+                    uri: image.uri,
+                    width: image.width,
+                    height: image.height,
+                    fileSize: image.fileSize,
+                    type: image.type,
+                })));
+
+                // TODO: Process the images here
+                // You can add your image processing logic here
+                Alert.alert('Images Selected', `Selected ${images.length} image(s)`);
+            }
+        } catch (error) {
+            console.error('Error picking image:', error);
+            Alert.alert('Error', 'Failed to pick image from gallery');
+        }
     }, []);
 
     const handleUploadAudio = useCallback(() => {
