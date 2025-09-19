@@ -1,4 +1,8 @@
-import { TranscribeTextRequest, TranscribeYoutubeRequest } from '@/types/transcribe';
+import {
+  TranscribePdfRequest,
+  TranscribeTextRequest,
+  TranscribeYoutubeRequest,
+} from '@/types/transcribe';
 import { sessionController } from './session-controller';
 import { supabase } from '@/lib/supabase';
 
@@ -34,4 +38,35 @@ const textTranscribe = async (text: TranscribeTextRequest) => {
   }
 };
 
-export { youtubeTranscribe, textTranscribe };
+const pdfTranscribe = async (pdf: TranscribePdfRequest) => {
+  try {
+    const { session } = await sessionController();
+
+    const formData = new FormData();
+
+    if (pdf.pdfFile) {
+      formData.append('pdfFile', pdf.pdfFile);
+      console.log('pdfFile', pdf.pdfFile);
+    } else if (pdf.pdfUrl) {
+      formData.append('pdfUrl', pdf.pdfUrl);
+    } else {
+      throw new Error('Either pdfFile or pdfUrl must be provided');
+    }
+
+    console.log('formData', formData);
+
+    const response = await supabase.functions.invoke('transcribe-pdf', {
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    console.log('response', response);
+  } catch (error) {
+    console.error('Error transcribing pdf:', error);
+    throw error instanceof Error ? error : new Error('Failed to transcribe pdf');
+  }
+};
+
+export { youtubeTranscribe, textTranscribe, pdfTranscribe };

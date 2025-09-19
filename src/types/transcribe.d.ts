@@ -10,3 +10,8 @@ export interface TranscribeYoutubeRequest {
 export interface TranscribeTextRequest {
   text: string;
 }
+
+export interface TranscribePdfRequest {
+  pdfFile: File;
+  pdfUrl?: string;
+}

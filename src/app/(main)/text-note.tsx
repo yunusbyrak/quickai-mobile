@@ -86,8 +86,6 @@ export default function TextNote() {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-      // TODO: Implement actual save functionality with notes service
-      console.log('Saving text:', state.text);
       await textTranscribe({ text: state.text });
 
       router.back();
