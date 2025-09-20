@@ -15,7 +15,7 @@ interface NoteDetailYoutubeProps {
     note: Note;
 }
 
-export default function YoutubeDetailScreen({
+export default function YoutubeDetail({
     note
 }: NoteDetailYoutubeProps) {
     const router = useRouter();

@@ -9,8 +9,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { ContextMenu, type ContextMenuAction } from '@/components/ui/context-menu';
 import { useState } from "react";
 import Markdown from '@/components/Markdown';
-import YoutubeDetailScreen from "@/screens/note-detail/youtube-detail";
 import { dateFormat } from "@/utils/functions";
+
+import NoteDetailYoutube from "@/screens/note-detail/youtube-detail";
+import NoteDetailAudio from "@/screens/note-detail/audio-detail";
 
 export default function NoteDetail() {
     const insets = useSafeAreaInsets();
@@ -142,15 +144,6 @@ export default function NoteDetail() {
                     paddingBottom: Math.max(insets.bottom, 16),
                 }}
             >
-                {/* Header Gradient Image */}
-                {/* <View className="absolute top-0 left-0 right-0 items-center" >
-                    <Image
-                        source={require('~/assets/images/header-gradient.png')}
-                        className="w-full"
-                        resizeMode="cover"
-                    />
-                </View> */}
-
                 {/* Centered title */}
                 <View className="px-4 pt-10" >
                     <Text
@@ -162,11 +155,12 @@ export default function NoteDetail() {
                 </View>
 
                 {/* Content Area */}
-                < ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false} >
+                <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false} >
 
-                    {note.type === 'youtube' && <YoutubeDetailScreen note={note} />}
+                    {note.type === 'youtube' && <NoteDetailYoutube note={note} />}
+                    {note.type === 'audio' && <NoteDetailAudio note={note} />}
 
-                    <NoteDetailCard
+                    {/* <NoteDetailCard
                         title="Summary"
                         defaultCollapsed={false}
                         onViewMore={() => router.push(`/(main)/notes/summary?slug=test&noteId=${noteId}`)}
@@ -174,7 +168,7 @@ export default function NoteDetail() {
                         <View className="px-4 pb-4">
                             <Markdown>{note.summary}</Markdown>
                         </View>
-                    </NoteDetailCard>
+                    </NoteDetailCard> */}
                 </ScrollView >
 
                 <Text className="text-xs text-center text-foreground/50">{dateFormat(note.created_at || '', 'short')}</Text>
