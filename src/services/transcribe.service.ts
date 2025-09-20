@@ -9,7 +9,36 @@ import { sessionController } from './session-controller';
 import { supabase } from '@/lib/supabase';
 import { TranscribeAudioRequest } from '@/types/note';
 
-const youtubeTranscribe = async (videos: TranscribeYoutubeRequest) => {
+export const transcribeAudio = async (audio: TranscribeAudioRequest) => {
+    try {
+        const { session } = await sessionController();
+        const formData = new FormData();
+
+        if (audio.audioFile) {
+            formData.append('audioFile', audio.audioFile);
+        } else if (audio.audioUrl) {
+            formData.append('audioUrl', audio.audioUrl);
+        } else {
+            throw new Error('Either audioFile or audioUrl must be provided');
+        }
+
+        const { data, error } = await supabase.functions.invoke('transcribe-audio', {
+            body: formData,
+            headers: {
+                Authorization: `Bearer ${session.access_token}`,
+            },
+        });
+        if (error) {
+            throw new Error('Failed to transcribe audio');
+        }
+        return data;
+    } catch (error) {
+        console.error('Error transcribing audio:', error);
+        throw error instanceof Error ? error : new Error('Failed to transcribe audio');
+    }
+};
+
+export const youtubeTranscribe = async (videos: TranscribeYoutubeRequest) => {
     try {
         const { session } = await sessionController();
 
@@ -49,7 +78,7 @@ const textTranscribe = async (text: TranscribeTextRequest) => {
     }
 };
 
-const pdfTranscribe = async (pdf: TranscribePdfRequest) => {
+export const pdfTranscribe = async (pdf: TranscribePdfRequest) => {
     try {
         const { session } = await sessionController();
 
@@ -111,7 +140,7 @@ export const imageTranscribe = async (image: TranscribeImageRequest) => {
     }
 };
 
-const uploadAudioTranscribe = async (audio: TranscribeUploadAudioRequest) => {
+export const uploadAudioTranscribe = async (audio: TranscribeUploadAudioRequest) => {
     try {
         const { session } = await sessionController();
 
@@ -140,5 +169,3 @@ const uploadAudioTranscribe = async (audio: TranscribeUploadAudioRequest) => {
         throw error instanceof Error ? error : new Error('Failed to upload audio');
     }
 };
-
-export { youtubeTranscribe, textTranscribe, pdfTranscribe, uploadAudioTranscribe };

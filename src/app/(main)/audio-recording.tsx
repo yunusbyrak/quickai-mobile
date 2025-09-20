@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 
 import { AudioContext, AudioManager, AudioRecorder, RecorderAdapterNode, AudioBuffer } from 'react-native-audio-api';
 import LoaderModal from '@/components/LoaderModal';
-import { transcribeAudio } from '@/services/audio.service';
+import { transcribeAudio } from '@/services/transcribe.service';
 
 const SAMPLE_RATE = 44100;
 

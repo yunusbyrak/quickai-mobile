@@ -26,7 +26,6 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import LoaderModal from './LoaderModal';
 import { pdfTranscribe, uploadAudioTranscribe } from '@/services/transcribe.service';
-import { transcribeAudio } from '@/services/audio.service';
 
 const getIconForNoteType = (type: string | null) => {
     switch (type) {

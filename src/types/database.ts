@@ -40,6 +40,8 @@ export type Database = {
           id: string
           link: string | null
           note_id: string | null
+          segments: Json | null
+          status: Database["public"]["Enums"]["type_status"] | null
           transcript: string | null
           updated_at: string | null
           user_id: string | null
@@ -49,6 +51,8 @@ export type Database = {
           id?: string
           link?: string | null
           note_id?: string | null
+          segments?: Json | null
+          status?: Database["public"]["Enums"]["type_status"] | null
           transcript?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -58,6 +62,8 @@ export type Database = {
           id?: string
           link?: string | null
           note_id?: string | null
+          segments?: Json | null
+          status?: Database["public"]["Enums"]["type_status"] | null
           transcript?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -222,6 +228,7 @@ export type Database = {
       }
       folders: {
         Row: {
+          count: number
           created_at: string | null
           description: string | null
           id: string
@@ -230,6 +237,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          count?: number
           created_at?: string | null
           description?: string | null
           id?: string
@@ -238,6 +246,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          count?: number
           created_at?: string | null
           description?: string | null
           id?: string
@@ -253,6 +262,7 @@ export type Database = {
           data: Json | null
           id: string
           note_id: string | null
+          status: Database["public"]["Enums"]["type_status"] | null
           updated_at: string | null
           url: string | null
           user_id: string | null
@@ -262,6 +272,7 @@ export type Database = {
           data?: Json | null
           id?: string
           note_id?: string | null
+          status?: Database["public"]["Enums"]["type_status"] | null
           updated_at?: string | null
           url?: string | null
           user_id?: string | null
@@ -271,6 +282,7 @@ export type Database = {
           data?: Json | null
           id?: string
           note_id?: string | null
+          status?: Database["public"]["Enums"]["type_status"] | null
           updated_at?: string | null
           url?: string | null
           user_id?: string | null
@@ -399,6 +411,7 @@ export type Database = {
           pages: Json | null
           pages_count: number | null
           size: number | null
+          status: Database["public"]["Enums"]["type_status"] | null
           updated_at: string | null
           user_id: string | null
         }
@@ -412,6 +425,7 @@ export type Database = {
           pages?: Json | null
           pages_count?: number | null
           size?: number | null
+          status?: Database["public"]["Enums"]["type_status"] | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -425,6 +439,7 @@ export type Database = {
           pages?: Json | null
           pages_count?: number | null
           size?: number | null
+          status?: Database["public"]["Enums"]["type_status"] | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -539,6 +554,186 @@ export type Database = {
           },
         ]
       }
+      templates: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          group_id: string | null
+          icon: string | null
+          id: string
+          language: string | null
+          name: string
+          order: number | null
+          prompt: string
+          slug: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          group_id?: string | null
+          icon?: string | null
+          id?: string
+          language?: string | null
+          name: string
+          order?: number | null
+          prompt: string
+          slug?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          group_id?: string | null
+          icon?: string | null
+          id?: string
+          language?: string | null
+          name?: string
+          order?: number | null
+          prompt?: string
+          slug?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "templates_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "templates_group"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      templates_group: {
+        Row: {
+          color: string | null
+          icon: string | null
+          id: string
+          language: string | null
+          name: string
+          slug: string | null
+        }
+        Insert: {
+          color?: string | null
+          icon?: string | null
+          id?: string
+          language?: string | null
+          name: string
+          slug?: string | null
+        }
+        Update: {
+          color?: string | null
+          icon?: string | null
+          id?: string
+          language?: string | null
+          name?: string
+          slug?: string | null
+        }
+        Relationships: []
+      }
+      text_summary: {
+        Row: {
+          created_at: string | null
+          data: string | null
+          id: string
+          note_id: string | null
+          status: Database["public"]["Enums"]["type_status"] | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data?: string | null
+          id?: string
+          note_id?: string | null
+          status?: Database["public"]["Enums"]["type_status"] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data?: string | null
+          id?: string
+          note_id?: string | null
+          status?: Database["public"]["Enums"]["type_status"] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "text_summary_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_generated_templates: {
+        Row: {
+          created_at: string | null
+          id: string
+          status: Database["public"]["Enums"]["template_status"] | null
+          template_id: string | null
+          text: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["template_status"] | null
+          template_id?: string | null
+          text: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["template_status"] | null
+          template_id?: string | null
+          text?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_generated_templates_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_templates: {
+        Row: {
+          created_at: string | null
+          icon: string | null
+          id: string
+          language: string | null
+          name: string
+          prompt: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          language?: string | null
+          name: string
+          prompt: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          language?: string | null
+          name?: string
+          prompt?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           device_id: string | null
@@ -590,19 +785,20 @@ export type Database = {
           created_at: string | null
           id: string
           lang: string | null
+          multiple: boolean | null
           note_id: string | null
           title: string | null
           transcripted_data: Json | null
           updated_at: string | null
           url: string | null
           user_id: string | null
-          segments: Json | null
         }
         Insert: {
           available_langs?: Json | null
           created_at?: string | null
           id?: string
           lang?: string | null
+          multiple?: boolean | null
           note_id?: string | null
           title?: string | null
           transcripted_data?: Json | null
@@ -615,6 +811,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           lang?: string | null
+          multiple?: boolean | null
           note_id?: string | null
           title?: string | null
           transcripted_data?: Json | null
@@ -691,7 +888,7 @@ export type Database = {
       }
       l2_normalize: {
         Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: string
+        Returns: unknown
       }
       match_note_chunks: {
         Args: {
@@ -702,12 +899,12 @@ export type Database = {
           user_id_param: string
         }
         Returns: {
-          id: string
-          similarity: number
-          meta: Json
-          content: string
           chunk_index: number
+          content: string
+          id: string
+          meta: Json
           note_type: Database["public"]["Enums"]["note_type"]
+          similarity: number
         }[]
       }
       sparsevec_out: {
@@ -761,8 +958,11 @@ export type Database = {
         | "meet"
         | "zoom"
         | "teams"
+        | "text"
       premium_type: "none" | "pro" | "business"
       quiz_status: "created" | "running" | "failed" | "completed"
+      template_status: "created" | "running" | "failed" | "completed"
+      type_status: "created" | "running" | "failed" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -906,9 +1106,12 @@ export const Constants = {
         "meet",
         "zoom",
         "teams",
+        "text",
       ],
       premium_type: ["none", "pro", "business"],
       quiz_status: ["created", "running", "failed", "completed"],
+      template_status: ["created", "running", "failed", "completed"],
+      type_status: ["created", "running", "failed", "completed"],
     },
   },
 } as const

@@ -13,7 +13,24 @@ import { AuthProvider } from '@/context/AuthContext';
 import { RevenueCatProvider } from '@/context/RevenuCatContext';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { Toaster } from 'sonner-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+// Create a client
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 5 * 60 * 1000, // 5 minutes
+            gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+            retry: (failureCount, error) => {
+                // Don't retry on 404 errors
+                if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
+                    return false;
+                }
+                return failureCount < 3;
+            },
+        },
+    },
+});
 
 export default function Layout() {
 
@@ -46,24 +63,26 @@ export default function Layout() {
         return <SplashScreen onAnimationFinish={() => setSplashAnimationFinished(true)} />;
     }
 
-    return <>
-        <RevenueCatProvider>
-            <ThemeProvider>
-                <ThemedLayout>
-                    <BottomSheetModalProvider>
-                        <AuthProvider>
-                            <Stack
-                                screenOptions={{
-                                    headerShown: false,
-                                }}
-                            />
-                        </AuthProvider>
-                    </BottomSheetModalProvider>
-                    <PortalHost />
-                </ThemedLayout>
-            </ThemeProvider>
-        </RevenueCatProvider>
-    </>;
+    return (
+        <QueryClientProvider client={queryClient}>
+            <RevenueCatProvider>
+                <ThemeProvider>
+                    <ThemedLayout>
+                        <BottomSheetModalProvider>
+                            <AuthProvider>
+                                <Stack
+                                    screenOptions={{
+                                        headerShown: false,
+                                    }}
+                                />
+                            </AuthProvider>
+                        </BottomSheetModalProvider>
+                        <PortalHost />
+                    </ThemedLayout>
+                </ThemeProvider>
+            </RevenueCatProvider>
+        </QueryClientProvider>
+    );
 }
 
 function ThemedLayout({ children }: { children: React.ReactNode }) {
