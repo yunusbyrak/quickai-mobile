@@ -5,12 +5,10 @@ import { useTheme } from '@/context/ThemeContext';
 import { getYouTubeVideoId } from '@/utils/functions';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
-import { router, Stack } from 'expo-router';
+import { router, Stack, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    Alert,
     Keyboard,
-    KeyboardAvoidingView,
     Platform,
     SafeAreaView,
     ScrollView,
@@ -36,6 +34,7 @@ interface YoutubeUrlInput {
 
 export default function YoutubeTranscribe() {
     const { isDark } = useTheme();
+    const router = useRouter()
     const [urlInputs, setUrlInputs] = useState<YoutubeUrlInput[]>([
         { id: '1', url: '', meta: null, isLoading: false, error: null },
     ]);
@@ -179,8 +178,10 @@ export default function YoutubeTranscribe() {
 
         try {
             // TODO: forward to the note detail screen
-            await youtubeTranscribe(requestBody);
+            const response = await youtubeTranscribe(requestBody);
+            console.log('response', response);
             toast.success(`Processing ${validUrls.length} video${validUrls.length > 1 ? 's' : ''} for transcription`,);
+            router.replace(`/(main)/notes/detail?noteId=${response.data.id}`);
         } catch (error) {
             toast.error('Failed to process videos');
         } finally {

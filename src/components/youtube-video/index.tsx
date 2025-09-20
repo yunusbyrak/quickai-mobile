@@ -7,7 +7,7 @@ import Modal from '../ui/modal';
 import { HapticButton } from '../ui/haptic-button';
 import VideoScreen from './video-screen';
 import { cn } from '@/lib/utils';
-import TranscriptScreen from '@/screens/note-detail/transcript';
+import TranscriptScreen from '@/screens/note-detail/youtube-transcript';
 
 interface YoutubeVideoProps {
     videoId: string;
