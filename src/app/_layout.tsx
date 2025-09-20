@@ -12,6 +12,8 @@ import { StatusBar, View } from 'react-native';
 import { AuthProvider } from '@/context/AuthContext';
 import { RevenueCatProvider } from '@/context/RevenuCatContext';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { Toaster } from 'sonner-native';
+
 
 export default function Layout() {
 
@@ -78,7 +80,7 @@ function ThemedLayout({ children }: { children: React.ReactNode }) {
                 <Animated.View entering={FadeIn} className={'flex-1'}>
                     {children}
                 </Animated.View>
-                {/* <Toaster /> */}
+                <Toaster position='bottom-center' />
             </View>
         </GestureHandlerRootView>
     );
