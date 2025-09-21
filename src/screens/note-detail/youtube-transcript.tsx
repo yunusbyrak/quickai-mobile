@@ -16,7 +16,7 @@ interface TranscriptSegment {
     duration: number;
 }
 
-interface TranscriptScreenProps {
+interface YoutubeTranscriptProps {
     onClose: () => void;
     transcriptData?: TranscriptSegment[];
     videoTitle?: string;
@@ -56,7 +56,7 @@ const TranscriptSegmentItem = React.memo(({ segment }: { segment: TranscriptSegm
         <View className="mb-4">
             <View className="flex-col items-start">
                 <View className="rounded">
-                    <Text className="text-orange-500 text-xs font-medium">
+                    <Text className="text-[#fdb728] text-xs font-medium">
                         [{formattedTime} - {endTime}]
                     </Text>
                 </View>
@@ -68,11 +68,11 @@ const TranscriptSegmentItem = React.memo(({ segment }: { segment: TranscriptSegm
     );
 });
 
-export default function TranscriptScreen({
+export default function YoutubeTranscript({
     onClose,
     transcriptData,
     videoTitle
-}: TranscriptScreenProps) {
+}: YoutubeTranscriptProps) {
     const insets = useSafeAreaInsets();
     const { isDark } = useTheme();
 
@@ -166,7 +166,7 @@ export default function TranscriptScreen({
                 </Text>
             </View>
             <View
-                className="flex-1 bg-white rounded-2xl shadow-xs border border-foreground/5 mx-4"
+                className="flex-1 bg-background rounded-2xl shadow-xs border border-foreground/5 mx-4"
             >
                 <FlashList
                     data={displayedSegments}

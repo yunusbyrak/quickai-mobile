@@ -3,7 +3,12 @@ import { Note } from "@/types/note";
 import { View } from "react-native";
 import { SeekBar } from "@/components/ui/seek-bar";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
-import { useState, useEffect } from "react";
+import { useAudioDetail } from "@/hooks/useDetailsHook";
+import { useEffect, useState } from "react";
+import { HapticButton } from "@/components/ui/haptic-button";
+import { LinearGradient } from "expo-linear-gradient";
+import Modal from "@/components/ui/modal";
+import AudioTranscript from "./audio-transcript";
 
 interface NoteDetailAudioProps {
     note: Note;
@@ -11,20 +16,15 @@ interface NoteDetailAudioProps {
 
 export default function NoteDetailAudio({ note }: NoteDetailAudioProps) {
     const audioPlayer = useAudioPlayer();
-    const [audioUri, setAudioUri] = useState<string | null>(null);
+    const [showTranscriptModal, setShowTranscriptModal] = useState(false);
+    const { data: audioDetail, isLoading, error } = useAudioDetail(note.id);
 
-    // Extract audio URI from note - you may need to adjust this based on your note structure
+    // Load audio when detail is available
     useEffect(() => {
-        // Test with the provided URL for now
-        const testUri = "http://127.0.0.1:54321/storage/v1/object/sign/audio/6ff03371-213e-4dde-8d45-cdb96bcd4fdf/99d8973e-01cf-47b7-ac0c-ac6556c3f770.mp3?token=eyJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhdWRpby82ZmYwMzM3MS0yMTNlLTRkZGUtOGQ0NS1jZGI5NmJjZDRmZGYvOTlkODk3M2UtMDFjZi00N2I3LWFjMGMtYWM2NTU2YzNmNzcwLm1wMyIsImlhdCI6MTc1ODQyNTE5NiwiZXhwIjoxNzYxMDE3MTk2fQ.FjsLlf4-gnPvSQ17CUWs4Ame6XiBNQxANQsTohwWZDY";
-
-        // Try to get URI from note first, fallback to test URI
-        const uri = (note as any).audio_url || (note as any).file_url || testUri;
-        if (uri) {
-            setAudioUri(uri);
-            audioPlayer.loadAudio(uri);
+        if (audioDetail?.audioUrl) {
+            audioPlayer.loadAudio(audioDetail.audioUrl);
         }
-    }, [note, audioPlayer]);
+    }, [audioDetail?.audioUrl, audioPlayer]);
 
     const handleSeek = (value: number) => {
         audioPlayer.setSliderValue(value);
@@ -42,31 +42,93 @@ export default function NoteDetailAudio({ note }: NoteDetailAudioProps) {
         }
     };
 
+    // Show loading state
+    if (isLoading) {
+        return (
+            <View className="flex-1 mb-2">
+                <View className="w-full bg-background rounded-lg shadow-sm shadow-black/5 p-4 gap-4 flex-col">
+                    <View className="py-8 items-center">
+                        <Text className="text-muted-foreground">
+                            Loading audio details...
+                        </Text>
+                    </View>
+                </View>
+            </View>
+        );
+    }
+
+    // Show error state
+    if (error) {
+        return (
+            <View className="flex-1 mb-2">
+                <View className="w-full bg-background rounded-lg shadow-sm shadow-black/5 p-4 gap-4 flex-col">
+                    <View className="py-8 items-center">
+                        <Text className="text-muted-foreground">
+                            Error loading audio details
+                        </Text>
+                    </View>
+                </View>
+            </View>
+        );
+    }
+
+    // Show no audio available state
     return (
         <View className="flex-1 mb-2">
             <View className="w-full bg-background rounded-lg shadow-sm shadow-black/5 p-4 gap-4 flex-col">
-                {audioUri ? (
-                    <SeekBar
-                        positionMillis={audioPlayer.positionMillis}
-                        durationMillis={audioPlayer.durationMillis}
-                        sliderValue={audioPlayer.sliderValue}
-                        isPlaying={audioPlayer.isPlaying}
-                        isBuffering={audioPlayer.isBuffering}
-                        isSeeking={audioPlayer.isSeeking}
-                        onPlayPause={audioPlayer.togglePlayPause}
-                        onSeek={handleSeek}
-                        onSeekStart={handleSeekStart}
-                        onSeekComplete={handleSeekComplete}
+                {audioDetail?.audioUrl && <SeekBar
+                    positionMillis={audioPlayer.positionMillis}
+                    durationMillis={audioPlayer.durationMillis}
+                    sliderValue={audioPlayer.sliderValue}
+                    isPlaying={audioPlayer.isPlaying}
+                    isBuffering={audioPlayer.isBuffering}
+                    isSeeking={audioPlayer.isSeeking}
+                    onPlayPause={audioPlayer.togglePlayPause}
+                    onSeek={handleSeek}
+                    onSeekStart={handleSeekStart}
+                    onSeekComplete={handleSeekComplete}
+                />}
+                <View className="relative">
+                    <Text variant='h4' className="text-[#fdb728]">Transcript</Text>
+                    <Text variant='p' numberOfLines={15} className="text-sm font-light">
+                        {audioDetail?.transcript}
+                    </Text>
+                    <LinearGradient
+                        colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
+                        style={{
+                            position: 'absolute',
+                            bottom: -4,
+                            left: 0,
+                            right: 0,
+                            height: 24,
+                            zIndex: 10,
+                        }}
+                        pointerEvents="none"
                     />
-                ) : (
-                    <View className="py-8 items-center">
-                        <Text className="text-muted-foreground">
-                            No audio file available
-                        </Text>
+                </View>
+                <HapticButton
+                    hapticType="medium"
+                    className="items-start"
+                    onPress={() => { setShowTranscriptModal(true) }}
+                >
+                    <View className="bg-muted-foreground/10 rounded-full p-1 px-3">
+                        <Text className="text-xs">View Transcript</Text>
                     </View>
-                )}
-
+                </HapticButton>
             </View>
+
+            <Modal
+                visible={showTranscriptModal}
+                animationType="slide"
+                presentationStyle="fullScreen"
+            >
+                <AudioTranscript
+                    onClose={() => setShowTranscriptModal(false)}
+                    segments={audioDetail?.segments || []}
+                    videoTitle={note.title || ''}
+                />
+            </Modal>
+
         </View>
     );
 }

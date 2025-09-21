@@ -64,7 +64,7 @@ export interface AudioSummary {
   link: string | null
   transcript: string | null
   segments: AudioTranscriptionSegment[] | null
-  status: 'running' | 'completed' | 'failed'
+  status: 'created' | 'running' | 'completed' | 'failed'
   created_at: string
   updated_at: string
 }

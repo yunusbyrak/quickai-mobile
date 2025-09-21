@@ -14,6 +14,13 @@ export const useAudioDetail = (noteId: string) => {
         queryKey: ['audio-detail', noteId],
         queryFn: () => getAudioDetail(noteId),
         enabled: !!noteId,
+        select: (data) => ({
+            ...data,
+            // Ensure segments are properly typed
+            segments: data.segments as any[] | null,
+            // Provide the audio URL for easy access
+            audioUrl: data.audioUrl
+        })
     });
 };
 
