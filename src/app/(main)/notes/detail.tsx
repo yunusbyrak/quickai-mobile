@@ -13,6 +13,9 @@ import { dateFormat } from "@/utils/functions";
 
 import NoteDetailYoutube from "@/screens/note-detail/youtube-detail";
 import NoteDetailAudio from "@/screens/note-detail/audio-detail";
+import NoteDetailPdf from "@/screens/note-detail/pdf-detail";
+import NoteDetailText from "@/screens/note-detail/text-detail";
+import NoteDetailImage from "@/screens/note-detail/image-detail";
 
 export default function NoteDetail() {
     const insets = useSafeAreaInsets();
@@ -159,7 +162,9 @@ export default function NoteDetail() {
 
                     {note.type === 'youtube' && <NoteDetailYoutube note={note} />}
                     {note.type === 'audio' && <NoteDetailAudio note={note} />}
-
+                    {note.type === 'pdf' && <NoteDetailPdf note={note} />}
+                    {note.type === 'text' && <NoteDetailText note={note} />}
+                    {note.type === 'image' && <NoteDetailImage note={note} />}
                     {/* <NoteDetailCard
                         title="Summary"
                         defaultCollapsed={false}

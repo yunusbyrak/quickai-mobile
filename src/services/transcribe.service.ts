@@ -58,7 +58,7 @@ export const youtubeTranscribe = async (videos: TranscribeYoutubeRequest) => {
     }
 };
 
-const textTranscribe = async (text: TranscribeTextRequest) => {
+export const textTranscribe = async (text: TranscribeTextRequest) => {
     try {
         const { session } = await sessionController();
 

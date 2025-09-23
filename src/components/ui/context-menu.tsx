@@ -58,7 +58,6 @@ export interface ContextMenuProps {
     onCancel?: () => void;
 }
 
-// TODO Add haptics to the context menu when it's opened
 function ContextMenuComponent({
     children,
     actions,

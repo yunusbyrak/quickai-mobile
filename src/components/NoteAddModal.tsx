@@ -25,7 +25,7 @@ import { useRouter } from 'expo-router';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import LoaderModal from './LoaderModal';
-import { pdfTranscribe, uploadAudioTranscribe } from '@/services/transcribe.service';
+import { imageTranscribe, pdfTranscribe, uploadAudioTranscribe } from '@/services/transcribe.service';
 
 const getIconForNoteType = (type: string | null) => {
     switch (type) {
@@ -202,26 +202,29 @@ export default function NoteAddModal() {
                 allowsMultipleSelection: true,
             });
 
+            setIsLoading(true);
+            setLoadingTitle('Uploading Images...');
+
             if (!result.canceled && result.assets && result.assets.length > 0) {
                 const images = result.assets;
-                console.log(
-                    'Selected Images:',
-                    images.map((image) => ({
-                        uri: image.uri,
-                        width: image.width,
-                        height: image.height,
-                        fileSize: image.fileSize,
-                        type: image.type,
-                    }))
-                );
-
-                // TODO: Process the images here
-                // You can add your image processing logic here
-                Alert.alert('Images Selected', `Selected ${images.length} image(s)`);
+                console.log('Selected Images:', images);
+                await imageTranscribe({
+                    imageFiles: images.map(
+                        (photo) =>
+                            ({
+                                uri: photo.uri,
+                                type: photo.mimeType || 'image/jpeg',
+                                name: photo.fileName,
+                            }) as any
+                    ),
+                })
+                setIsLoading(false);
             }
         } catch (error) {
             console.error('Error picking image:', error);
             Alert.alert('Error', 'Failed to pick image from gallery');
+        } finally {
+            setIsLoading(false);
         }
     }, []);
 

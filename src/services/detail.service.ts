@@ -59,16 +59,58 @@ export const getAudioDetail = async (noteId: string): Promise<Tables<'audio_summ
     };
 };
 
-export const getImageDetail = async (noteId: string): Promise<Tables<'image_summary'>> => {
+export const getImageDetail = async (noteId: string): Promise<Tables<'image_summary'> & { imageUrls?: string[] }> => {
     const { data, error } = await supabase
         .from('image_summary')
         .select('*')
         .eq('note_id', noteId)
         .single();
+
     if (error) {
         throw error;
     }
-    return data;
+
+    // Get signed URLs for images
+    let imageUrls: string[] = [];
+    if (data.url) {
+        try {
+            // Split comma-separated URLs
+            const imagePaths = data.url.split(',').map((path: string) => path.trim());
+
+            for (const imagePath of imagePaths) {
+                try {
+                    const { data: urlData, error: urlError } = await supabase.storage
+                        .from('image')
+                        .createSignedUrl(imagePath, 3600); // 1 hour expiry
+
+                    if (urlError) {
+                        console.error('Error creating signed URL for image:', imagePath, urlError);
+                        // Fallback to public URL if signed URL fails
+                        const { data: publicUrlData } = supabase.storage
+                            .from('image')
+                            .getPublicUrl(imagePath);
+                        imageUrls.push(publicUrlData.publicUrl);
+                    } else {
+                        imageUrls.push(urlData.signedUrl);
+                    }
+                } catch (err) {
+                    console.error('Error getting image URL for:', imagePath, err);
+                    // Fallback to public URL
+                    const { data: publicUrlData } = supabase.storage
+                        .from('image')
+                        .getPublicUrl(imagePath);
+                    imageUrls.push(publicUrlData.publicUrl);
+                }
+            }
+        } catch (err) {
+            console.error('Error processing image URLs:', err);
+        }
+    }
+
+    return {
+        ...data,
+        imageUrls
+    };
 };
 
 export const getPdfDetail = async (noteId: string): Promise<Tables<'pdf_summary'>> => {

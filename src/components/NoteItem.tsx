@@ -5,7 +5,7 @@ import { Text } from '@/components/ui/text'
 import { SvgIcon } from '@/components/ui/svg-icon'
 import { cn } from '@/lib/utils'
 import type { Note } from '@/types/note'
-import React from 'react'
+import React, { useRef, useCallback } from 'react'
 import { Skeleton } from './ui/skeleton'
 import { HapticButton } from './ui/haptic-button'
 import { ContextMenu, type ContextMenuAction } from './ui/context-menu'
@@ -47,6 +47,8 @@ export interface NoteItemProps extends VariantProps<typeof noteItemVariants> {
 
 const getIconForNoteType = (type: string | null) => {
     switch (type) {
+        case 'text':
+            return 'text-fields'
         case 'audio':
             return 'graphic-eq'
         case 'pdf':
@@ -147,6 +149,19 @@ export const NoteItem = React.forwardRef<
     const displayTime = note.displayTime || formatTime(note.created_at)
     const iconColor = getColorForNoteType(note.type)
 
+    // Debounce click prevention
+    const lastClickTime = useRef<number>(0)
+    const DEBOUNCE_DELAY = 500 // 500ms debounce delay
+
+    const handlePress = useCallback(() => {
+        const now = Date.now()
+        if (now - lastClickTime.current < DEBOUNCE_DELAY) {
+            return // Ignore rapid successive clicks
+        }
+        lastClickTime.current = now
+        onPress?.(note)
+    }, [onPress, note])
+
     const actions: ContextMenuAction[] = [
         {
             id: note.favorite ? 'remove-from-favorites' : 'add-to-favorites',
@@ -225,7 +240,7 @@ export const NoteItem = React.forwardRef<
                 <HapticButton
                     hapticType="medium"
                     ref={ref}
-                    onPress={() => onPress?.(note)}
+                    onPress={handlePress}
                     className={cn(noteItemVariants({ variant }), className)}
                     {...props}
                 >
@@ -260,7 +275,7 @@ export const NoteItem = React.forwardRef<
                         </View>
 
                         <View className="gap-1">
-                            <Text className="text-muted-foreground text-xs">
+                            <Text className="text-muted-foreground text-xs" style={{ fontSize: 10 }}>
                                 {displayDate} {displayTime}
                             </Text>
                             {(note.tag || note.folder_name) && (
@@ -287,7 +302,7 @@ export const NoteItem = React.forwardRef<
             <HapticButton
                 hapticType="medium"
                 ref={ref}
-                onPress={() => onPress?.(note)}
+                onPress={handlePress}
                 className={cn(noteItemVariants({ variant }), className)}
                 {...props}
             >

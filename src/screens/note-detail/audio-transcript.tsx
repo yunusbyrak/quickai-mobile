@@ -1,10 +1,12 @@
 import { HapticButton } from "@/components";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/context/ThemeContext";
+import { useTranscript } from "@/hooks/useTranscript";
+import { generateTranscriptHTML } from "@/templates/transcript-templates";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import { memo } from "react";
-import { View, Pressable } from "react-native";
+import { memo, useEffect, useMemo } from "react";
+import { View, Pressable, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface AudioTranscriptionSegment {
@@ -21,8 +23,9 @@ interface AudioTranscriptionSegment {
 
 interface AudioTranscriptProps {
     onClose: () => void;
+    content: string;
     segments: AudioTranscriptionSegment[];
-    videoTitle: string;
+    title: string;
 }
 
 const AudioTranscriptSegmentItem = memo(({ segment }: { segment: AudioTranscriptionSegment }) => {
@@ -53,19 +56,74 @@ const AudioTranscriptSegmentItem = memo(({ segment }: { segment: AudioTranscript
 
 export default function AudioTranscript({
     onClose,
+    content,
     segments,
-    videoTitle
+    title
 }: AudioTranscriptProps) {
-
     const insets = useSafeAreaInsets();
     const { isDark } = useTheme();
+
+    // Generate custom HTML for the transcript with segments using template
+    const customHTML = useMemo(() => {
+        return generateTranscriptHTML('audio', {
+            title: title || 'Transcript',
+            date: new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }),
+            content: content,
+            segments: segments.map(segment => ({
+                start: segment.start,
+                text: segment.text.trim()
+            }))
+        });
+    }, [segments, title, content]);
+
+    const {
+        isLoading,
+        error,
+        printTranscript,
+        shareTranscript,
+        clearError
+    } = useTranscript({
+        onSuccess: () => {
+            console.log('Operation successful');
+            // Clear any previous errors on success
+            clearError();
+        },
+        onError: (err) => {
+            console.error('Operation failed:', err);
+            // Show user-friendly error message
+            Alert.alert(
+                'Sharing Error',
+                err.message || 'Failed to share transcript. Please try again.',
+                [
+                    { text: 'OK', onPress: clearError }
+                ]
+            );
+        }
+    });
+
+    // Show error alert when error state changes
+    useEffect(() => {
+        if (error) {
+            Alert.alert(
+                'Sharing Error',
+                error.message || 'Failed to share transcript. Please try again.',
+                [
+                    { text: 'OK', onPress: clearError }
+                ]
+            );
+        }
+    }, [error, clearError]);
 
     return (
         <View className="flex-1 bg-muted gap-3" style={{
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
         }}>
-            <View className="px-2">
+            <View className="px-2 flex-row justify-between items-center">
                 <HapticButton
                     onPress={() => onClose()}
                     className="rounded-full"
@@ -77,13 +135,37 @@ export default function AudioTranscript({
                         color={isDark ? 'white' : 'black'}
                     />
                 </HapticButton>
+
+                <View className="flex-row gap-2 mr-2">
+                    <HapticButton
+                        hapticType="medium"
+                        className="rounded-full items-center justify-center"
+                        accessibilityRole="button"
+                        accessibilityLabel="Note options"
+                        onPress={() => shareTranscript(content, title)}
+                    >
+                        <Ionicons name="share-outline" size={26} color={isDark ? 'white' : 'black'} />
+                    </HapticButton>
+                    <HapticButton
+                        onPress={() => printTranscript(title, customHTML)}
+                        className="rounded-full"
+                        disabled={isLoading}
+                    >
+                        <Ionicons
+                            name={"print-outline"}
+                            size={26}
+                            color={isDark ? 'white' : 'black'}
+                        />
+                    </HapticButton>
+                </View>
+
             </View>
             <View className="px-4" >
                 <Text
                     variant="h3"
                     className="text-foreground font-medium"
                 >
-                    Transcript
+                    {title}
                 </Text>
             </View>
             <View

@@ -25,6 +25,7 @@ const SplashScreen = ({
                 ref={animation}
                 loop={false}
                 onAnimationFinish={onAnimationFinish}
+                speed={2}
                 style={{
                     flex: 1,
                     height: '100%',

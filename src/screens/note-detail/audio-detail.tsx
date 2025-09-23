@@ -1,6 +1,6 @@
 import { Text } from "@/components/ui/text";
 import { Note } from "@/types/note";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { SeekBar } from "@/components/ui/seek-bar";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useAudioDetail } from "@/hooks/useDetailsHook";
@@ -9,6 +9,7 @@ import { HapticButton } from "@/components/ui/haptic-button";
 import { LinearGradient } from "expo-linear-gradient";
 import Modal from "@/components/ui/modal";
 import AudioTranscript from "./audio-transcript";
+import { supabase } from "@/lib/supabase";
 
 interface NoteDetailAudioProps {
     note: Note;
@@ -17,7 +18,7 @@ interface NoteDetailAudioProps {
 export default function NoteDetailAudio({ note }: NoteDetailAudioProps) {
     const audioPlayer = useAudioPlayer();
     const [showTranscriptModal, setShowTranscriptModal] = useState(false);
-    const { data: audioDetail, isLoading, error } = useAudioDetail(note.id);
+    const { data: audioDetail, isLoading, error, refetch } = useAudioDetail(note.id);
 
     // Load audio when detail is available
     useEffect(() => {
@@ -88,33 +89,31 @@ export default function NoteDetailAudio({ note }: NoteDetailAudioProps) {
                     onSeekStart={handleSeekStart}
                     onSeekComplete={handleSeekComplete}
                 />}
-                <View className="relative">
-                    <Text variant='h4' className="text-[#fdb728]">Transcript</Text>
-                    <Text variant='p' numberOfLines={15} className="text-sm font-light">
-                        {audioDetail?.transcript}
-                    </Text>
-                    <LinearGradient
-                        colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
-                        style={{
-                            position: 'absolute',
-                            bottom: -4,
-                            left: 0,
-                            right: 0,
-                            height: 24,
-                            zIndex: 10,
-                        }}
-                        pointerEvents="none"
-                    />
-                </View>
-                <HapticButton
-                    hapticType="medium"
-                    className="items-start"
-                    onPress={() => { setShowTranscriptModal(true) }}
-                >
-                    <View className="bg-muted-foreground/10 rounded-full p-1 px-3">
-                        <Text className="text-xs">View Transcript</Text>
+                <Pressable onPress={() => { setShowTranscriptModal(true) }} className="gap-4">
+                    <View className="relative">
+                        <Text variant='h4' className="text-[#fdb728]">Transcript</Text>
+                        <Text variant='p' numberOfLines={15} className="text-sm font-light">
+                            {audioDetail?.transcript}
+                        </Text>
+                        <LinearGradient
+                            colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
+                            style={{
+                                position: 'absolute',
+                                bottom: -4,
+                                left: 0,
+                                right: 0,
+                                height: 24,
+                                zIndex: 10,
+                            }}
+                            pointerEvents="none"
+                        />
                     </View>
-                </HapticButton>
+                    <View className="items-start">
+                        <View className="bg-muted-foreground/10 rounded-full p-1 px-3">
+                            <Text className="text-xs">View Transcript</Text>
+                        </View>
+                    </View>
+                </Pressable>
             </View>
 
             <Modal
@@ -124,8 +123,9 @@ export default function NoteDetailAudio({ note }: NoteDetailAudioProps) {
             >
                 <AudioTranscript
                     onClose={() => setShowTranscriptModal(false)}
+                    content={audioDetail?.transcript || ''}
                     segments={audioDetail?.segments || []}
-                    videoTitle={note.title || ''}
+                    title={note.title || ''}
                 />
             </Modal>
 
