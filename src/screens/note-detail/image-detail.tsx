@@ -4,17 +4,30 @@ import Modal from "@/components/ui/modal";
 import { useImageDetail } from "@/hooks/useDetailsHook";
 import { Note } from "@/types/note";
 import { View, Image, Pressable, Dimensions, ScrollView, SafeAreaView } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { supabase } from "@/lib/supabase";
 
 interface ImageDetailProps {
     note: Note;
 }
 
 export default function ImageDetail({ note }: ImageDetailProps) {
-    const { data: imageDetail, isLoading, error } = useImageDetail(note.id);
+    const { data: imageDetail, isLoading, error, refetch } = useImageDetail(note.id);
     const screenHeight = Dimensions.get('window').height;
     const [isModalVisible, setIsModalVisible] = useState(false);
+
+    useEffect(() => {
+        const channel = supabase
+            .channel('public:image_summary')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'image_summary', filter: `note_id=eq.${note.id}` }, (payload) => {
+                refetch();
+            }).subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        }
+    }, [note.id]);
 
     if (isLoading) {
         return (

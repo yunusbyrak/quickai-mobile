@@ -1,7 +1,9 @@
 import { SvgIcon } from "@/components";
 import { Text } from "@/components/ui/text";
 import { usePdfDetail } from "@/hooks/useDetailsHook";
+import { supabase } from "@/lib/supabase";
 import { Note } from "@/types/note";
+import { useEffect } from "react";
 import { View } from "react-native";
 
 interface PdfDetailProps {
@@ -10,7 +12,19 @@ interface PdfDetailProps {
 
 export default function PDFDetail({ note }: PdfDetailProps) {
 
-    const { data: pdfDetail, isLoading, error } = usePdfDetail(note.id);
+    const { data: pdfDetail, isLoading, error, refetch } = usePdfDetail(note.id);
+
+    useEffect(() => {
+        const channel = supabase
+            .channel('public:pdf_summary')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'pdf_summary', filter: `note_id=eq.${note.id}` }, (payload) => {
+                refetch();
+            }).subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        }
+    }, [note.id]);
 
     if (isLoading) {
 

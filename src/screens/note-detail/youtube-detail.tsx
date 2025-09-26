@@ -10,6 +10,7 @@ import { YoutubeMeta } from "react-native-youtube-iframe";
 import { useYoutubeDetail } from "@/hooks/useDetailsHook";
 import { getYouTubeVideoId } from "@/utils/functions";
 import TranscriptScreen from "./youtube-transcript";
+import { supabase } from "@/lib/supabase";
 
 interface NoteDetailYoutubeProps {
     note: Note;
@@ -19,12 +20,24 @@ export default function YoutubeDetail({
     note
 }: NoteDetailYoutubeProps) {
     const router = useRouter();
-    const { data: youtubeData, isLoading, error } = useYoutubeDetail(note.id);
+    const { data: youtubeData, isLoading, error, refetch } = useYoutubeDetail(note.id);
     const [thumbnails, setThumbnails] = useState<YoutubeMeta[]>([]);
     const [showAll, setShowAll] = useState(false);
     const [showTranscriptModal, setShowTranscriptModal] = useState(false);
     const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
     const [selectedTranscriptData, setSelectedTranscriptData] = useState<any[]>([]);
+
+    useEffect(() => {
+        const channel = supabase
+            .channel('public:youtube_summary')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'youtube_summary', filter: `note_id=eq.${note.id}` }, (payload) => {
+                refetch();
+            }).subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        }
+    }, [note.id]);
 
     const parsedTranscriptData = useMemo(() => {
         if (!youtubeData?.transcripted_data || !Array.isArray(youtubeData.transcripted_data)) {

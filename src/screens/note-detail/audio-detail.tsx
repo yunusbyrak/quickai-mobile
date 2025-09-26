@@ -20,6 +20,18 @@ export default function NoteDetailAudio({ note }: NoteDetailAudioProps) {
     const [showTranscriptModal, setShowTranscriptModal] = useState(false);
     const { data: audioDetail, isLoading, error, refetch } = useAudioDetail(note.id);
 
+    useEffect(() => {
+        const channel = supabase
+            .channel('public:audio_summary')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'audio_summary', filter: `note_id=eq.${note.id}` }, (payload) => {
+                refetch();
+            }).subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        }
+    }, [note.id]);
+
     // Load audio when detail is available
     useEffect(() => {
         if (audioDetail?.audioUrl) {

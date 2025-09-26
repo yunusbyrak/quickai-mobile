@@ -16,6 +16,7 @@ import NoteDetailAudio from "@/screens/note-detail/audio-detail";
 import NoteDetailPdf from "@/screens/note-detail/pdf-detail";
 import NoteDetailText from "@/screens/note-detail/text-detail";
 import NoteDetailImage from "@/screens/note-detail/image-detail";
+import NoteBottom from "@/components/NoteBottom";
 
 export default function NoteDetail() {
     const insets = useSafeAreaInsets();
@@ -178,6 +179,7 @@ export default function NoteDetail() {
 
                 <Text className="text-xs text-center text-foreground/50">{dateFormat(note.created_at || '', 'short')}</Text>
             </View >
+            <NoteBottom />
         </>
     )
 }
